@@ -1,0 +1,39 @@
+package OneTransitionDemo.OneTransitionDemo.DTO;
+
+import OneTransitionDemo.OneTransitionDemo.ENUMS.ExamType;
+import OneTransitionDemo.OneTransitionDemo.Models.Exam;
+
+import java.time.Duration;
+
+public class ExamSummaryDTO {
+    private Long id;
+    private final ExamType type;
+    private String subject;
+    private String teacher;
+    private String teacherImage;
+    private String datetime;
+    private String duration;
+    private String deadline;
+
+    public ExamSummaryDTO(Exam exam) {
+        this.id = exam.getId();
+        this.subject = exam.getTitle(); // from examMeta.title
+        this.teacher = exam.getTeacher().getUsername(); // or fetch User.getFullName()
+        this.teacherImage = "https://i.pinimg.com/736x/82/79/93/8279935cfd89205b83f7bc739c19b98b.jpg"; // hardcoded or from teacher profile
+        this.datetime = exam.getStartTime().toString(); // or format as string
+        this.deadline = exam.getEndTime().toString();
+        this.duration = Duration.between(exam.getStartTime(), exam.getEndTime()).toMinutes() + " mins";
+        this.type = exam.getType(); // quiz / file / startable etc.
+    }
+
+    // Getters (or use Lombok @Getter)
+    // Getters (required for JSON serialization)
+    public String getSubject() { return subject; }
+    public String getTeacher() { return teacher; }
+    public String getTeacherImage() { return teacherImage; }
+    public String getDatetime() { return datetime; }
+    public String getDeadline() { return deadline; }
+    public String getDuration() { return duration; }
+    public ExamType getType() { return type; }
+    public Long getId() { return id; }
+}
