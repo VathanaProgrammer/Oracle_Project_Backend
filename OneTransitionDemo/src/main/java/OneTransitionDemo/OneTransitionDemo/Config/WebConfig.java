@@ -9,6 +9,8 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -39,8 +41,8 @@ public class WebConfig {
                 .cors(withDefaults())     // enable CORS using above config
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**", "/upload/**", "/api/posts/**").permitAll()
-                        .requestMatchers("/me", "/api/users/**", "/chat/**", "/api/messages/**").authenticated()
+                        .requestMatchers("/api/user/register","/api/user/login", "/upload/**").permitAll()
+                        .requestMatchers("/me", "/api/user/**", "/chat/**", "/api/messages/**").authenticated()
                         .requestMatchers("/api/comments/**", "/api/likes/**").authenticated()
                         .anyRequest().authenticated()
                 )

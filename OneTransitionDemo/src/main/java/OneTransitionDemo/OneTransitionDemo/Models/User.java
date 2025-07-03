@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+
 @Entity
 @Table(name = "TBL_USERS")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
@@ -74,6 +75,8 @@ public class User implements UserDetails {
         this.profilePicture = profilePicture;
     }
 
+    public String getFirstname(){ return this.firstname; }
+    public String getLastname(){ return this.lastname; }
     @Override
     @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {

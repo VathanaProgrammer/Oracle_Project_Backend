@@ -1,5 +1,6 @@
 package OneTransitionDemo.OneTransitionDemo.Services;
 
+import OneTransitionDemo.OneTransitionDemo.ENUMS.Role;
 import OneTransitionDemo.OneTransitionDemo.Models.User;
 import OneTransitionDemo.OneTransitionDemo.Repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -50,14 +51,15 @@ public class UserService implements UserDetailsService {
         return userRepo.findByEmail((Email));
     }
 
-    public User registerUser(String username, String password, String email, MultipartFile profileImage) throws IOException {
+    public User registerUser(String firstName, String lastName, String password, String role, String email, MultipartFile profileImage) throws IOException {
         if (userRepo.existsByEmail(email)) {
             throw new IllegalArgumentException("Email is already in use");
         }
 
         User user = new User();
-        user.setUsername(username);
-
+        user.setFirstname(firstName);
+        user.setLastname(lastName);
+        user.setRole(Role.valueOf(role.toUpperCase()));
         String encoder = passwordEncoder.encode(password);
         user.setPassword(encoder);
 
@@ -75,8 +77,6 @@ public class UserService implements UserDetailsService {
         }
         System.out.println("Saved user ID: " + user.getId());
         return userRepo.save(user);
-
-
     }
 
 //    public List<UserDTO> getAllUsers() {
