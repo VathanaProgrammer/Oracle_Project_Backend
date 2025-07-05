@@ -42,7 +42,7 @@ public class WebConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/user/register","/api/user/login", "/upload/**").permitAll()
-                        .requestMatchers("/me", "/api/user/**", "/chat/**", "/api/messages/**").authenticated()
+                        .requestMatchers("/me", "/api/user/**","/api/user/logout", "/chat/**", "/api/messages/**").authenticated()
                         .requestMatchers("/api/comments/**", "/api/likes/**").authenticated()
                         .anyRequest().authenticated()
                 )

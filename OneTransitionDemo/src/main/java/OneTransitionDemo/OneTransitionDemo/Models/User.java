@@ -33,6 +33,9 @@ public class User implements UserDetails {
     private String phone;
     private String profilePicture;
 
+    @OneToMany(mappedBy = "user")
+    private List<UserSessionLog> sessionLogs;
+
     @OneToMany(mappedBy = "teacher")
     private List<Exam> examsCreated;
 
@@ -77,6 +80,15 @@ public class User implements UserDetails {
 
     public String getFirstname(){ return this.firstname; }
     public String getLastname(){ return this.lastname; }
+
+    public List<UserSessionLog> getSessionLogs() {
+        return sessionLogs;
+    }
+
+    public void setSessionLogs(List<UserSessionLog> userSessionLogs){
+        this.sessionLogs = userSessionLogs;
+    }
+
     @Override
     @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
