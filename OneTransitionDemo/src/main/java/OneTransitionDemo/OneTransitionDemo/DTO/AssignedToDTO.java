@@ -1,5 +1,7 @@
 package OneTransitionDemo.OneTransitionDemo.DTO;
 
+import OneTransitionDemo.OneTransitionDemo.Models.AssignedTo;
+
 public class AssignedToDTO {
     private Long id;
     private int batch;
@@ -8,7 +10,21 @@ public class AssignedToDTO {
     private String shiftName;
     private String shiftTime;
     private String major;
+    private String subjectName;
 
+
+    public AssignedToDTO() {}
+
+    public AssignedToDTO(AssignedTo assignedTo) {
+        this.id = assignedTo.getId();
+        this.shiftName = assignedTo.getShiftName();
+        this.shiftTime = assignedTo.getShiftTime();
+        this.location = assignedTo.getLocation();
+        this.batch = assignedTo.getBatch();
+        this.year = assignedTo.getYear();
+        this.major = assignedTo.getMajor() != null ? assignedTo.getMajor().getName() : null;
+        this.subjectName = assignedTo.getSubject().getName() != null ? assignedTo.getSubject().getName() : null;
+    }
     // Getters and setters
     public Long getId() {
         return id;
@@ -57,5 +73,9 @@ public class AssignedToDTO {
     }
     public void setMajor(String major) {
         this.major = major;
+    }
+
+    public String getSubjectName() {
+        return subjectName;
     }
 }

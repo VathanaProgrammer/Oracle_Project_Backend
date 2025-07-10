@@ -15,13 +15,14 @@ public class CustomHandshakeHandler extends DefaultHandshakeHandler {
     protected Principal determineUser(ServerHttpRequest request,
                                       WebSocketHandler wsHandler,
                                       Map<String, Object> attributes) {
-        // Use existing attribute or fallback to a random user
-        Object userAttr = attributes.get("user");
-        if (userAttr instanceof Principal p) {
-            return p;
+        // If Spring Security has set an authenticated principal, use it safely
+        Principal principal = request.getPrincipal();
+        if (principal != null && principal.getName() != null) {
+            return principal;
         }
 
-        // fallback for anonymous users (dev mode)
+        // Otherwise, fallback
         return () -> "user-" + UUID.randomUUID();
     }
+
 }

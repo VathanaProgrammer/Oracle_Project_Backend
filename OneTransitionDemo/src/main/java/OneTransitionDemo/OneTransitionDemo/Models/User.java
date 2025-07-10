@@ -81,6 +81,10 @@ public class User implements UserDetails {
     public String getFirstname(){ return this.firstname; }
     public String getLastname(){ return this.lastname; }
 
+    public String getProfilePicture() {
+        return profilePicture;
+    }
+
     public List<UserSessionLog> getSessionLogs() {
         return sessionLogs;
     }

@@ -3,17 +3,19 @@ package OneTransitionDemo.OneTransitionDemo.Services;
 import OneTransitionDemo.OneTransitionDemo.DTO.ExamDTO;
 import OneTransitionDemo.OneTransitionDemo.DTO.ExamDetailsDTO;
 import OneTransitionDemo.OneTransitionDemo.DTO.ExamSummaryDTO;
+import OneTransitionDemo.OneTransitionDemo.DTO.UserActionDTO;
 import OneTransitionDemo.OneTransitionDemo.ENUMS.ExamType;
 import OneTransitionDemo.OneTransitionDemo.ENUMS.Status;
 import OneTransitionDemo.OneTransitionDemo.Models.*;
-import OneTransitionDemo.OneTransitionDemo.Repositories.AssignToRepository;
-import OneTransitionDemo.OneTransitionDemo.Repositories.ExamRepository;
-import OneTransitionDemo.OneTransitionDemo.Repositories.MajorRepository;
-import OneTransitionDemo.OneTransitionDemo.Repositories.UserRepository;
+import OneTransitionDemo.OneTransitionDemo.Repositories.*;
+import OneTransitionDemo.OneTransitionDemo.Response.ResponseUtil;
 import jakarta.persistence.ManyToMany;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -31,6 +33,9 @@ public class ExamService {
 
     @Autowired
     private AssignToRepository assignToRepository;
+
+    @Autowired
+    private UserActionRepository userActionRepository;
 
     public Exam convertDTOToEntity(ExamDTO dto) {
         Exam exam = new Exam();
@@ -134,10 +139,45 @@ public class ExamService {
                 });
     }
 
+    public Optional<ExamDetailsDTO> getExamDetailsDTOForAdminById(Long id) {
+        return examRepository.findExamWithQuestionsForAdmin(id)
+                .map(exam -> {
+                    // Manually initialize related bags
+                    for (Question q : exam.getQuestions()) {
+                        q.getOptions().size();       // forces loading of options
+                        q.getExamFiles().size();     // forces loading of examFiles
+                    }
+                    return new ExamDetailsDTO(exam);
+                });
+    }
+
     public List<ExamSummaryDTO> getAvailableExamSummaries() {
         return examRepository.findByStatus(Status.PUBLISHED)
                 .stream()
                 .map(ExamSummaryDTO::new)
                 .collect(Collectors.toList());
     }
+
+    public Map<String, Object> endExam(UserActionDTO dto, Long id) {
+        Exam exam = examRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Exam not found"));
+        if (exam == null){
+            return ResponseUtil.error("Exam not found!");
+        }
+
+        UserAction action = new UserAction();
+        action.setLastName(dto.getLastName());
+        action.setFirstName(dto.getFirstName());
+        action.setLabel(dto.getLabel());
+        action.setDescription(dto.getDescription());
+        action.setType(dto.getType());
+        action.setTimestamp(LocalDateTime.now());
+        userActionRepository.save(action);
+
+        exam.setStatus(Status.ENDED);
+        examRepository.save(exam);
+
+        return ResponseUtil.success("Exam was successfully ended.");
+    }
+
 }

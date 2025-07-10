@@ -19,7 +19,7 @@ public class AssignedTo {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn( name = "subject_id")
-    private Subject subject_id;
+    private Subject subject;
 
     private String shiftName;
     private String shiftTime;
@@ -81,5 +81,9 @@ public class AssignedTo {
 
     public void setYear(int year) {
         this.year = year;
+    }
+
+    public Subject getSubject() {
+        return subject;
     }
 }

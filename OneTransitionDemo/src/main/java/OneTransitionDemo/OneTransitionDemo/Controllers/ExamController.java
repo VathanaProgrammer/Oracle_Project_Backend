@@ -2,6 +2,7 @@ package OneTransitionDemo.OneTransitionDemo.Controllers;
 
 import OneTransitionDemo.OneTransitionDemo.DTO.*;
 import OneTransitionDemo.OneTransitionDemo.Models.Exam;
+import OneTransitionDemo.OneTransitionDemo.Models.User;
 import OneTransitionDemo.OneTransitionDemo.Services.ExamFileService;
 import OneTransitionDemo.OneTransitionDemo.Services.ExamService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,15 +11,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -39,6 +38,7 @@ public class ExamController {
 
     @PostMapping
     public ResponseEntity<Exam> saveExam(
+            @AuthenticationPrincipal User user,
             @RequestPart("examMeta") String examMetaJson,
             @RequestPart(value = "files", required = false) List<MultipartFile> files
     ) throws IOException {
@@ -84,10 +84,32 @@ public class ExamController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/summary")
-    public List<ExamSummaryDTO> getAvailableExams() {
+    @GetMapping(value = "/forAdmin/{id}", produces = "application/json")
+    public ResponseEntity<ExamDetailsDTO> getExamDetailsForAdmin(@PathVariable Long id) {
+        return examService.getExamDetailsDTOForAdminById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/active")
+    public List<ExamSummaryDTO> getAvailableExams(@AuthenticationPrincipal User user) {
         List<ExamSummaryDTO> examSummaryDTO= examService.getAvailableExamSummaries();
         System.out.println(examSummaryDTO.size());
         return examSummaryDTO;
+    }
+
+    @PutMapping("/{id}/end")
+    public ResponseEntity<?> endExam(@AuthenticationPrincipal User user, @PathVariable Long id) {
+
+        UserActionDTO dto = new UserActionDTO(user.getId(),
+                user.getFirstname(),
+                user.getLastname(),
+                "Ended_exam",
+                "Ended exam",
+                user.getFirstname() + " "+ user.getLastname() + " just end an exam");
+
+        Map<String, Object> response = examService.endExam(dto,id);
+        messagingTemplate.convertAndSend("/topic/api/actions/recent", dto);
+        return ResponseEntity.status((Boolean) response.get("success") ? 200 : 400).body(response);
     }
 }

@@ -1,10 +1,12 @@
 package OneTransitionDemo.OneTransitionDemo.Controllers;
 
 import OneTransitionDemo.OneTransitionDemo.Models.User;
+import OneTransitionDemo.OneTransitionDemo.Models.UserAction;
 import OneTransitionDemo.OneTransitionDemo.Models.UserSessionLog;
 import OneTransitionDemo.OneTransitionDemo.Repositories.UserRepository;
 import OneTransitionDemo.OneTransitionDemo.Repositories.UserSessionLogRepository;
 import OneTransitionDemo.OneTransitionDemo.Request.loginRequest;
+import OneTransitionDemo.OneTransitionDemo.Services.UserActionService;
 import OneTransitionDemo.OneTransitionDemo.Services.UserService;
 import OneTransitionDemo.OneTransitionDemo.Services.JWTService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -49,6 +52,12 @@ public class UserController {
 
     @Autowired
     private UserSessionLogRepository userSessionLogRepository;
+
+    @Autowired
+    private UserActionService userActionService;
+
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     @PostMapping("/register")
     public ResponseEntity<User> registerUser(
@@ -88,6 +97,15 @@ public class UserController {
             sessionLog.setUser(user);
             sessionLog.setStartTime(LocalDateTime.now());
             userSessionLogRepository.save(sessionLog);
+
+            UserAction recentAction = userActionService.recordAction(
+                    user.getId(),
+                    "login",
+                    "Login",
+                    user.getFirstname() +" "+  user.getLastname() + " just logined", user.getFirstname(), user.getLastname()
+            );
+
+            messagingTemplate.convertAndSend("/topic/api/actions/recent", recentAction);
 
             return ResponseEntity.ok(token); // Return only the token
         }  catch (BadCredentialsException ex) {             // <— Print full stack trace

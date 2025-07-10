@@ -19,4 +19,15 @@ public interface ExamRepository extends JpaRepository<Exam, Long> {
           WHERE e.id = :id
         """)
     Optional<Exam> findExamWithQuestions(@Param("id") Long id);
+    @Query("""
+    SELECT DISTINCT e
+    FROM Exam e
+    LEFT JOIN FETCH e.questions q
+    LEFT JOIN FETCH e.assignedTo a
+    LEFT JOIN FETCH a.major
+    LEFT JOIN FETCH a.subject
+    WHERE e.id = :id
+""")
+    Optional<Exam> findExamWithQuestionsForAdmin(@Param("id") Long id);
+
 }

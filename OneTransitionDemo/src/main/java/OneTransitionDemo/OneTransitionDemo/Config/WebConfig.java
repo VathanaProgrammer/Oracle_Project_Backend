@@ -41,8 +41,9 @@ public class WebConfig {
                 .cors(withDefaults())     // enable CORS using above config
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/user/register","/api/user/login", "/upload/**").permitAll()
-                        .requestMatchers("/me", "/api/user/**","/api/user/logout", "/chat/**", "/api/messages/**").authenticated()
+                        .requestMatchers("/api/user/register","/api/user/login", "/upload/**", "/api/assignments/**").permitAll()
+                        .requestMatchers("/me", "/api/user/**","/api/user/logout", "/chat/**","/api/exams/**", "/api/messages/**").authenticated()
+                        .requestMatchers("/api/actions/**").authenticated()
                         .requestMatchers("/api/comments/**", "/api/likes/**").authenticated()
                         .anyRequest().authenticated()
                 )
@@ -64,6 +65,7 @@ public class WebConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList(
                 "http://localhost:5173",
+                "http://localhost:5174",
                 "http://192.168.18.61:5173",
                 "http://172.20.10.2:5173",
                 "http://192.168.12.174:5173"
