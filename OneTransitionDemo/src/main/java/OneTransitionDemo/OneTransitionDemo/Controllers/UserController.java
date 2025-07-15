@@ -1,5 +1,6 @@
 package OneTransitionDemo.OneTransitionDemo.Controllers;
 
+import OneTransitionDemo.OneTransitionDemo.DTO.UserDTO;
 import OneTransitionDemo.OneTransitionDemo.Models.User;
 import OneTransitionDemo.OneTransitionDemo.Models.UserAction;
 import OneTransitionDemo.OneTransitionDemo.Models.UserSessionLog;
@@ -29,10 +30,7 @@ import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/user")
@@ -60,7 +58,7 @@ public class UserController {
     private SimpMessagingTemplate messagingTemplate;
 
     @PostMapping("/register")
-    public ResponseEntity<User> registerUser(
+    public ResponseEntity<?> registerUser(
             @RequestParam("firstName") String firstName,
             @RequestParam("lastName") String lastName,
             @RequestParam("role") String role,
@@ -69,10 +67,10 @@ public class UserController {
             @RequestParam(value = "profileImage", required = false) MultipartFile profileImage
     ) throws IOException {
 
+        Map<String, Object> response;
+        response = userService.registerUser(firstName, lastName, password, role, email, profileImage);
 
-        User registeredUser = userService.registerUser(firstName, lastName, password, role, email, profileImage);
-
-        return ResponseEntity.ok(registeredUser);
+        return ResponseEntity.status((Boolean) response.get("success") ? 200 : 400).body(response);
     }
 
     @PostMapping("/login")
@@ -87,10 +85,14 @@ public class UserController {
             User user = userService.findByEmail(loginRequest.getEmail()).orElseThrow();
             System.out.println("LoginController: found user id:" +user.getId()+ "\n firstname: "+user.getFirstname()+"\n" +" lastname: "+ user.getLastname());
             System.out.println("Generate token...");
-            String token = jwtService.generateToken(user.getEmail());
+            long expiryMillis = loginRequest.getRememberMe() ?
+                    (1000L * 60 * 60 * 24 * 30) :  // 30 days
+                    (1000L * 60 * 60);            // 1 hour
+
+            String token = jwtService.generateToken(user.getEmail(), expiryMillis);
             System.out.println("LoginController: token generated: " + token);
 
-            jwtService.setTokenCookie(response, token); // Set as HttpOnly cookie
+            jwtService.setTokenCookie(response, token, expiryMillis / 1000); // Convert ms to seconds
             System.out.println("LoginController: cookie set.");
 
             UserSessionLog sessionLog = new UserSessionLog();
@@ -141,6 +143,34 @@ public class UserController {
         return ResponseEntity.ok(Map.of("message", "logout success!"));
     }
 
+    @PutMapping("/update")
+    public ResponseEntity<?> updateUser(
+            @AuthenticationPrincipal User user,
+            @RequestParam("firstName") String firstName,
+            @RequestParam("lastName") String lastName,
+            @RequestParam("role") String role,
+            @RequestParam("email") String email,
+            @RequestParam(value = "profileImage", required = false) MultipartFile profileImage
+    ) throws IOException {
+
+        System.out.println(user);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not authenticated");
+        }
+        if (!user.getEmail().equals(email)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not authorized");
+        }
+
+        if (firstName == null || lastName == null || role == null || email == null) {
+            return ResponseEntity.badRequest().body("Required fields cannot be null");
+        }
+
+        Map<String, Object> response;
+        response = userService.updateUser(user.getId(), firstName, lastName, role, email, profileImage);
+
+        return ResponseEntity.status((Boolean) response.get("success") ? 200 : 400).body(response);
+    }
+
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentUser(
             @AuthenticationPrincipal User user) {
@@ -149,7 +179,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not authenticated");
         }
 
-        // Define today & week start
+        // Define today && week start
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime todayStart = LocalDate.now().atStartOfDay();
         LocalDateTime weekStart = LocalDate.now().with(DayOfWeek.MONDAY).atStartOfDay();
@@ -164,7 +194,9 @@ public class UserController {
 
         // Build response
         Map<String, Object> userData = Map.of(
+                "id", user.getId(),
                 "firstname", user.getFirstname(),
+                "profile", user.getProfilePicture(),
                 "lastname", user.getLastname(),
                 "email", user.getEmail(),
                 "role", user.getRole(),
@@ -188,5 +220,10 @@ public class UserController {
         Map<String, Object> userInfo = new HashMap<>();
         userInfo.put("userinfo :",  existUser);
         return ResponseEntity.ok(userInfo);
+    }
+    
+    @GetMapping("/all")
+    public ResponseEntity<List<UserDTO>> getAllUsers(@AuthenticationPrincipal User user){
+        return ResponseEntity.ok(userService.getAllUsers());
     }
 }

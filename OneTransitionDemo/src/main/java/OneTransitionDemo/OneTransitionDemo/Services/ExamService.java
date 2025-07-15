@@ -37,95 +37,80 @@ public class ExamService {
     @Autowired
     private UserActionRepository userActionRepository;
 
-    public Exam convertDTOToEntity(ExamDTO dto) {
-        Exam exam = new Exam();
+    @Autowired
+    private TeacherRepository teacherRepository;
 
+    // Helper to avoid repeating ourselves for both new and update
+    private void mapDTOToExam(Exam exam, ExamDTO dto) {
         exam.setTitle(dto.getTitle());
         exam.setDescription(dto.getDescription());
         exam.setType(ExamType.valueOf(dto.getType().toUpperCase()));
         exam.setStatus(Status.valueOf(dto.getStatus().toUpperCase()));
-
-        //Query compare
-        // INSERT INTO exams (title, description, start_time, end_time, duration, duration_unit)
-        // VALUES ('Final Exam', 'End of term exam', '2025-06-20 09:00', '2025-06-20 10:00', 60, 'minutes');
-
-        //find the user who create this exam
-        //System.out.println("Looking for username: " + dto.getCreatedBy());
-        User teacher = userRepository.findById(dto.getCreatedBy()).orElseThrow(
-                () -> new RuntimeException("User not found with id: " + dto.getCreatedBy())  // SELECT * FROM users WHERE id = 5;
-                                                                                                //-- Assume it returns ID = 5
-                                                                                                //-- Then use that ID as foreign key
-        );
-
-        exam.setTeacher(teacher);
         exam.setStartTime(dto.getStartTime());
         exam.setEndTime(dto.getEndTime());
+        exam.setDuration(dto.getDuration());
+        exam.setDuration_unit(dto.getDurationUnit());
 
-        exam.setDuration(dto.getDuration()); // it's just an int now
-        exam.setDuration_unit(dto.getDurationUnit()); // simple string
+        Teacher teacher = teacherRepository.findByUserId(dto.getCreatedBy())
+                .orElseThrow(() -> new RuntimeException("Teacher not found"));
+        exam.setTeacher(teacher);
 
-        AssignedTo assignedTo = assignToRepository.findById(dto.getAssignTo()) // SELECT * FROM assigned_to WHERE id = 2;
+        AssignedTo assignedTo = assignToRepository.findById(dto.getAssignTo())
                 .orElseThrow(() -> new RuntimeException("AssignedTo not found"));
         exam.setAssignedTo(assignedTo);
 
-        if (dto.getQuestions() != null && !dto.getQuestions().isEmpty()) {
-            List<Question> questions = dto.getQuestions().stream() // Loop through the list of questions
-                    .map(qdto -> {
-                        Question q = new Question();
-                        q.setContent(qdto.getQuestion());
-                        q.setScore(qdto.getScore());
-                        q.setType(qdto.getType());
-                        q.setAutoScore(qdto.getAutoScore());
-                        q.setCorrectAnswer(qdto.getCorrectAnswer());
-                        q.setExams(List.of(exam)); // and this will create a middle table call tbl_exam_questions //
-                                                    // Each Question knows it belongs to this Exam
-                                                    //  @JsonIgnore
-                                                    // @ManyToMany(mappedBy = "questions")
-                                                    // private List<Exam> exams;
-                        // ADD THIS to save multiple-choice options
-                        if ("multiple_choice".equalsIgnoreCase(qdto.getType()) && qdto.getOptions() != null) {
-                            q.setOptions(qdto.getOptions()); // set reference to the question_id and option
-                                                            //    @ElementCollection(fetch = FetchType.EAGER)
-                                                            //    @CollectionTable(
-                                                            //            name = "TBL_QUESTION_OPTIONS",
-                                                            //            joinColumns = @JoinColumn(name = "question_id")
-                                                            //    )
-                                                            //    @Column(name = "option_text")
-                                                            //    private List<String> options;
-                            q.setCorrectAnswerIndex(qdto.getCorrectAnswerIndex());
-                        }
+        // Map questions
+        List<Question> questions = dto.getQuestions().stream().map(qdto -> {
+            Question q = new Question();
+            q.setContent(qdto.getContent());
+            q.setScore(qdto.getScore());
+            q.setType(qdto.getType());
+            q.setAutoScore(qdto.getAutoScore());
+            q.setCorrectAnswer(qdto.getCorrectAnswer());
+            q.setExams(List.of(exam));
 
+            if ("multiple_choice".equalsIgnoreCase(qdto.getType())) {
+                q.setOptions(qdto.getOptions());
+                q.setCorrectAnswerIndex(qdto.getCorrectAnswerIndex());
+            }
 
-                        // Handle fileExams conversion
-                        if (qdto.getFileExams() != null) { // Loop through all fileExams[] return like of fileExam object[]
-                            List<ExamFile> examFiles = qdto.getFileExams().stream() // set reference to question in Question and ExamFile
-                                    .map(fdto -> { // ExamFileDTO goes from QuestionDTO
-                                        ExamFile ef = new ExamFile();
-                                        ef.setTitle(fdto.getTitle());
-                                        ef.setDescription(fdto.getDescription());
-                                        ef.setFileUrl(fdto.getFileUrl()); // set list of fileUrl we set at the start
-                                        ef.setExam(exam);  // set reference to the exam_id
-                                        ef.setQuestion(q); // set reference to the question_id
-                                        return ef;
-                                    })
-                                    .collect(Collectors.toList());
-                            q.setExamFiles(examFiles);  // set file exam
-                        }
-                        return q; // when q is return the object questions will have a list of
-                                    // question as long as the QuestionDTO is sent from the front end
-                    }).collect(Collectors.toList());
+            if (qdto.getFileExams() != null) {
+                List<ExamFile> examFiles = qdto.getFileExams().stream().map(fdto -> {
+                    ExamFile ef = new ExamFile();
+                    ef.setTitle(fdto.getTitle());
+                    ef.setDescription(fdto.getDescription());
+                    ef.setFileUrl(fdto.getFileUrl());
+                    ef.setExam(exam);
+                    ef.setQuestion(q);
+                    return ef;
+                }).collect(Collectors.toList());
+                q.setExamFiles(examFiles);
+            }
 
-            exam.setQuestions(questions);// set reference of exam_id and question_id
-                                            // Exam knows its Questions
-                                            //    @ManyToMany(cascade = CascadeType.ALL) // One Exam can have many question
-                                            //    @JoinTable(name = "tbl_exam_questions",
-                                            //            joinColumns = @JoinColumn(name = "exam_id"),
-                                            //            inverseJoinColumns = @JoinColumn(name = "question_id"))
-                                            //    private List<Question> questions;
-        }
+            return q;
+        }).collect(Collectors.toList());
 
+        exam.setQuestions(questions);
+    }
+
+    // for create new exam
+    public Exam convertDTOToEntity(ExamDTO dto) {
+        Exam exam = new Exam();
+        mapDTOToExam(exam, dto);
         return examRepository.save(exam);
     }
+
+    //for update an existed exam
+    public Exam updateExamFromDTO(Long id, ExamDTO dto) {
+        Exam exam = examRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Exam not found"));
+
+        exam.getQuestions().clear(); // Clear old questions
+        mapDTOToExam(exam, dto);
+        return examRepository.save(exam);
+    }
+
+
 
     public Optional<ExamDetailsDTO> getExamDetailsDTOById(Long id) {
         return examRepository.findExamWithQuestions(id)
@@ -153,6 +138,20 @@ public class ExamService {
 
     public List<ExamSummaryDTO> getAvailableExamSummaries() {
         return examRepository.findByStatus(Status.PUBLISHED)
+                .stream()
+                .map(ExamSummaryDTO::new)
+                .collect(Collectors.toList());
+    }
+
+    public List<ExamSummaryDTO> getDraftExams(){
+        return examRepository.findByStatus(Status.DRAFT)
+                .stream()
+                .map(ExamSummaryDTO::new)
+                .collect(Collectors.toList());
+    }
+
+    public List<ExamSummaryDTO> getCompletedExams(){
+        return examRepository.findByStatus(Status.EXPIRED)
                 .stream()
                 .map(ExamSummaryDTO::new)
                 .collect(Collectors.toList());

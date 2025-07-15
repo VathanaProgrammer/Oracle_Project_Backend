@@ -23,6 +23,7 @@ public class ExamDetailsDTO {
     private String duration_unit;
     private Status status;
     private String teacherName;
+    private Long teacherId;
     private AssignedToDTO assignedToDTO;
     private String teacherImage;
     private List<QuestionDTO> questions;
@@ -35,9 +36,10 @@ public class ExamDetailsDTO {
         this.duration = exam.getDuration();
         this.duration_unit = exam.getDuration_unit();
         this.status = exam.getStatus();
-        this.teacherName = exam.getTeacher().getFirstname() + " " + exam.getTeacher().getLastname();
+        this.teacherName = exam.getTeacher().getUser().getFirstname() + " " + exam.getTeacher().getUser().getLastname();
+        this.teacherId = exam.getTeacher().getId();
         this.assignedToDTO= new AssignedToDTO(exam.getAssignedTo());
-        this.teacherImage = exam.getTeacher().getProfilePicture();
+        this.teacherImage = exam.getTeacher().getUser().getProfilePicture();
         this.title = exam.getTitle();
         this.type = exam.getType().name();
         this.questions = exam.getQuestions().stream()
@@ -50,6 +52,10 @@ public class ExamDetailsDTO {
     public String getTitle() { return title; }
     public String getType() { return type; }
     public List<QuestionDTO> getQuestions() { return questions; }
+
+    public Long getTeacherId() {
+        return teacherId;
+    }
 
     public String getDescription() {
         return description;

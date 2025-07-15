@@ -21,14 +21,14 @@ public class JWTService {
     // Use a fixed secret key (at least 256 bits base64 encoded)
     private static final String MY_KEY = "kdx8T7V+PqZFd+mZepqT+W/UgC+xtq9jA0eI6q0jnp8=";
 
-    public String generateToken(String username) {
+    public String generateToken(String username, long expiryMillis) {
         Map<String, Object> claims = new HashMap<>();
 
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(username)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10 hours
+                .setExpiration(new Date(System.currentTimeMillis() + expiryMillis))
                 .signWith(getKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -38,18 +38,18 @@ public class JWTService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public void setTokenCookie(HttpServletResponse response, String token) {
+    public void setTokenCookie(HttpServletResponse response, String token, long maxAgeSeconds) {
         ResponseCookie cookie = ResponseCookie.from("jwt", token)
                 .httpOnly(true)
-                .secure(false)  // false for localhost http, true for https prod
+                .secure(false)
                 .path("/")
-                .maxAge(7 * 24 * 60 * 60)
-                .sameSite("Lax")  // MUST be None for cross-origin cookie to work
+                .maxAge(maxAgeSeconds) // <-- Use dynamic maxAge
+                .sameSite("Lax")
                 .build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-
     }
+
 
     public String extractUsername(String token) {
         return Jwts.parserBuilder()

@@ -77,6 +77,37 @@ public class ExamController {
         return ResponseEntity.ok(examReturn);
     }
 
+    @PutMapping("/{examId}")
+    public ResponseEntity<Exam> updateExam(
+            @PathVariable Long examId,
+            @AuthenticationPrincipal User user,
+            @RequestPart("examMeta") String examMetaJson,
+            @RequestPart(value = "files", required = false) List<MultipartFile> files
+    ) throws IOException {
+        ExamDTO examDTO = objectMapper.readValue(examMetaJson, ExamDTO.class);
+
+        // Assign files to fileExam DTOs before converting to Entity
+        int fileIndex = 0;
+        for (QuestionDTO question : examDTO.getQuestions()) {
+            if ("file_exam".equalsIgnoreCase(question.getType())) {
+                for (ExamFileDTO fileExam : question.getFileExams()) {
+                    if (files != null && fileIndex < files.size()) {
+                        MultipartFile file = files.get(fileIndex);
+                        String fileUrl = examFileService.saveFile(file);
+                        fileExam.setFileUrl(fileUrl);
+                        fileIndex++;
+                    }
+                }
+            }
+        }
+
+        // 🔁 Convert DTO to entity and update instead of creating new
+        Exam updatedExam = examService.updateExamFromDTO(examId, examDTO);
+
+        return ResponseEntity.ok(updatedExam);
+    }
+
+
     @GetMapping(value = "/{id}", produces = "application/json")
     public ResponseEntity<ExamDetailsDTO> getExamDetails(@PathVariable Long id) {
         return examService.getExamDetailsDTOById(id)
@@ -95,6 +126,18 @@ public class ExamController {
     public List<ExamSummaryDTO> getAvailableExams(@AuthenticationPrincipal User user) {
         List<ExamSummaryDTO> examSummaryDTO= examService.getAvailableExamSummaries();
         System.out.println(examSummaryDTO.size());
+        return examSummaryDTO;
+    }
+
+    @GetMapping("/draft")
+    public List<ExamSummaryDTO> getDraftExams(@AuthenticationPrincipal User user) {
+        System.out.println("Draft exams has requested!");
+        List<ExamSummaryDTO> examSummaryDTO = examService.getDraftExams();
+        return examSummaryDTO;
+    }
+    @GetMapping("/completed")
+    public List<ExamSummaryDTO> getCompletedExams(@AuthenticationPrincipal User user) {
+        List<ExamSummaryDTO> examSummaryDTO = examService.getCompletedExams();
         return examSummaryDTO;
     }
 

@@ -17,6 +17,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import OneTransitionDemo.OneTransitionDemo.Services.JWTService;
 import java.util.Arrays;
@@ -26,7 +27,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
-public class WebConfig {
+public class WebConfig implements WebMvcConfigurer {
     @Autowired
     private JWTService jwtService;
 
@@ -41,9 +42,9 @@ public class WebConfig {
                 .cors(withDefaults())     // enable CORS using above config
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/user/register","/api/user/login", "/upload/**", "/api/assignments/**").permitAll()
-                        .requestMatchers("/me", "/api/user/**","/api/user/logout", "/chat/**","/api/exams/**", "/api/messages/**").authenticated()
-                        .requestMatchers("/api/actions/**").authenticated()
+                        .requestMatchers("/api/user/register","/api/user/login","/api/uploads/profile/**", "/upload/**").permitAll()
+                        .requestMatchers("/me", "/api/user/**","/api/user/logout" , "/chat/**","/api/exams/**", "/api/messages/**").authenticated()
+                        .requestMatchers("/api/actions/**", "/api/assignments/**").authenticated()
                         .requestMatchers("/api/comments/**", "/api/likes/**").authenticated()
                         .anyRequest().authenticated()
                 )
@@ -79,6 +80,10 @@ public class WebConfig {
         return source;
     }
 
-
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/api/upload/profile/**")
+                .addResourceLocations("file:D:/spring/upload/profile/");
+    }
 
 }

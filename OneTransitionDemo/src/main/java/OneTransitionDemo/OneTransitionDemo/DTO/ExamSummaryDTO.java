@@ -19,8 +19,8 @@ public class ExamSummaryDTO {
     public ExamSummaryDTO(Exam exam) {
         this.id = exam.getId();
         this.subject = exam.getAssignedTo().getSubject().getName(); // from examMeta.title
-        this.teacher = exam.getTeacher().getUsername(); // or fetch User.getFullName()
-        this.teacherImage = "https://i.pinimg.com/736x/cd/0e/a8/cd0ea8673c18ddbb6020e65e31f34641.jpg"; // hardcoded or from teacher profile
+        this.teacher = exam.getTeacher().getUser().getFirstname() + " " + exam.getTeacher().getUser().getLastname(); // or fetch User.getFullName()
+        this.teacherImage = exam.getTeacher().getUser().getProfilePicture();// hardcoded or from teacher profile
         this.datetime = exam.getStartTime().toString(); // or format as string
         this.deadline = exam.getEndTime().toString();
         this.status = exam.getStatus().toString();

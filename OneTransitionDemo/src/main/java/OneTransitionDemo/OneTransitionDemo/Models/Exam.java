@@ -38,8 +38,8 @@ public class Exam {
 
     @JsonIgnore
     @ManyToOne
-    @JoinColumn( name = "teacher_id")
-    private User teacher;
+    @JoinColumn(name = "teacher_id")
+    private Teacher teacher;
 
     @ManyToOne
     @JoinColumn(name = "assigned_to_id")
@@ -70,8 +70,8 @@ public class Exam {
     public ExamType getType() { return type; }
     public void setType(ExamType type) { this.type = type; }
 
-    public User getTeacher() { return teacher; }
-    public void setTeacher(User teacher) { this.teacher = teacher; }
+    public Teacher getTeacher() { return teacher; }
+    public void setTeacher(Teacher teacher) { this.teacher = teacher; }
 
 
     public String getDuration_unit(){

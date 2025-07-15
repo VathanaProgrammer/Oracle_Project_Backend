@@ -36,9 +36,6 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user")
     private List<UserSessionLog> sessionLogs;
 
-    @OneToMany(mappedBy = "teacher")
-    private List<Exam> examsCreated;
-
     @OneToMany(mappedBy = "student")
     private List<ExamResult> examResults;
 
@@ -122,6 +119,10 @@ public class User implements UserDetails {
     @JsonIgnore
     public boolean isEnabled() {
         return true;
+    }
+
+    public String getPhone() {
+        return phone;
     }
 }
 
