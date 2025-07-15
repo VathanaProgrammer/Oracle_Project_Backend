@@ -83,6 +83,7 @@ cd Oracle_Project_Backend
 Make sure you have Oracle XE 21c running.
 
 Update your src/main/resources/application.properties like this:
+```
 spring.application.name=OneTransitionDemo
 server.port=8080
 
@@ -96,6 +97,7 @@ spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.OracleDialect
 spring.jpa.show-sql=true
 spring.jpa.properties.hibernate.format_sql=true
 logging.level.org.hibernate.SQL=DEBUG
+```
 
 3️⃣ Run the project
 
