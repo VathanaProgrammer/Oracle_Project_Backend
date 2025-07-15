@@ -60,6 +60,7 @@ https://github.com/VathanaProgrammer/Oracle_Project_Frontend
 ---
 
 ## 🗂️ Project Structure
+```
 src/main/java/
 ├── controllers/ # REST API Controllers
 ├── services/ # Business Logic
@@ -67,7 +68,7 @@ src/main/java/
 ├── repositories/ # Data Access Layer
 ├── config/ # Security & WebSocket config
 └── OneTransitionDemoApplication.java
-
+```
 ---
 
 ## ⚙️ Installation & Setup
@@ -102,18 +103,22 @@ Use an IDE (IntelliJ / Eclipse) or terminal:
 
 ./mvnw spring-boot:run
 
-🔐 API Features
-User Authentication (JWT with HttpOnly Cookies)
+---
 
-Role-based Access Control (Admin, Teacher, Student)
+## 🔐 API Features
+* User Authentication (JWT with HttpOnly Cookies)
 
-Exam & Assignment Management
+* Role-based Access Control (Admin, Teacher, Student)
 
-Real-Time Notifications (WebSocket)
+* Exam & Assignment Management
 
-File Upload (Profile & Exam Files)
+* Real-Time Notifications (WebSocket)
 
-User Activity Log (Login, Logout)
+* File Upload (Profile & Exam Files)
+
+* User Activity Log (Login, Logout)
+
+---
 
 | Method | Endpoint               | Description                  |
 | ------ | ---------------------- | ---------------------------- |
