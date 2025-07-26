@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 @Table( name = "TBL_ANSWER_OPTIONS")
 public class AnswerOption {
     @Id
-    @GeneratedValue
+    @GeneratedValue( strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String text;

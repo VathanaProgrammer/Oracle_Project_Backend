@@ -1,9 +1,6 @@
 package OneTransitionDemo.OneTransitionDemo.Models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table( name = "TBL_DEPARTMENTS")
@@ -11,7 +8,7 @@ public class Department {
     public Department() {}
 
     @Id
-    @GeneratedValue
+    @GeneratedValue (strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
 

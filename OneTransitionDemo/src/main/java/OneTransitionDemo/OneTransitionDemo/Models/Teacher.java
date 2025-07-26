@@ -8,7 +8,7 @@ import java.util.List;
 @Table( name = "TBL_TEACHERS")
 public class Teacher {
     @Id
-    @GeneratedValue
+    @GeneratedValue (strategy = GenerationType.IDENTITY)
     private Long id;
 
     @OneToOne

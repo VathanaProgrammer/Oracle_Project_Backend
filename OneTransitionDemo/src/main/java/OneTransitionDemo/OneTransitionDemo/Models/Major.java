@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 @Table( name = "TBL_MAJORS")
 public class Major {
     @Id
-    @GeneratedValue
+    @GeneratedValue (strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
 
