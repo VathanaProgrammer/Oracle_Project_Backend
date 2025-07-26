@@ -3,7 +3,7 @@ package OneTransitionDemo.OneTransitionDemo.DTO;
 import java.time.LocalDateTime;
 
 public class UserActionDTO {
-
+    private Long id;
     private Long userId;
 
     private String firstName;
@@ -68,4 +68,12 @@ public class UserActionDTO {
     public LocalDateTime getTimestamp() { return timestamp; }
 
     public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getId() {
+        return id;
+    }
 }

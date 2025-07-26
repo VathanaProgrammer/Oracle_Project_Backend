@@ -1,15 +1,20 @@
 package OneTransitionDemo.OneTransitionDemo.Services;
 
 import OneTransitionDemo.OneTransitionDemo.DTO.UserDTO;
+import OneTransitionDemo.OneTransitionDemo.DTO.UserSummaryDTO;
 import OneTransitionDemo.OneTransitionDemo.ENUMS.Role;
 import OneTransitionDemo.OneTransitionDemo.Models.Student;
 import OneTransitionDemo.OneTransitionDemo.Models.Teacher;
 import OneTransitionDemo.OneTransitionDemo.Models.User;
+import OneTransitionDemo.OneTransitionDemo.Models.UserAction;
 import OneTransitionDemo.OneTransitionDemo.Repositories.UserRepository;
 import OneTransitionDemo.OneTransitionDemo.Repositories.TeacherRepository;
 import OneTransitionDemo.OneTransitionDemo.Repositories.StudentRepository;
 import OneTransitionDemo.OneTransitionDemo.Response.ResponseUtil;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -33,17 +38,19 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepo;
     private final TeacherRepository teacherRepo;
     private final StudentRepository studentRepo;
+    private final UserActionService userActionService;
 
     @Value("${upload.path.profile}")
     private String uploadPath;
 
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepo, TeacherRepository teacherRepo, StudentRepository studentRepo, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepo, TeacherRepository teacherRepo, StudentRepository studentRepo, PasswordEncoder passwordEncoder, UserActionService userActionService) {
         this.userRepo = userRepo;
         this.teacherRepo = teacherRepo;
         this.studentRepo = studentRepo;
         this.passwordEncoder = passwordEncoder;
+        this.userActionService = userActionService;
     }
 
     @Override
@@ -60,13 +67,14 @@ public class UserService implements UserDetailsService {
         return userRepo.findByEmail((Email));
     }
 
-    public Map<String, Object> registerUser(String firstName, String lastName, String password, String role, String email, MultipartFile profileImage) throws IOException {
+    public Map<String, Object> registerUser(String firstName, String lastName, String password, String role, String email, MultipartFile profileImage, String gender) throws IOException {
         if (userRepo.existsByEmail(email)) {
             return ResponseUtil.error("This email is already use");
         }
 
         User user = new User();
         user.setFirstname(firstName);
+        user.setGender(gender);
         user.setLastname(lastName);
         user.setRole(Role.valueOf(role.toUpperCase()));
         String encoder = passwordEncoder.encode(password);
@@ -144,7 +152,7 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
     }
 
-    public Map<String, Object> updateUser(Long id, String firstName, String lastName, String role, String email, MultipartFile profileImage) throws IOException {
+    public Map<String, Object> updateUser(Long id, String firstName, String lastName, String role, String email, MultipartFile profileImage, String gender) throws IOException {
         User user = userRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
 
@@ -157,6 +165,7 @@ public class UserService implements UserDetailsService {
 
         user.setFirstname(firstName);
         user.setLastname(lastName);
+        user.setGender(gender);
         user.setRole(newRole);
         user.setEmail(email);
 
@@ -206,11 +215,63 @@ public class UserService implements UserDetailsService {
         return ResponseUtil.success("User updated successfully");
     }
 
-    public List<UserDTO> getAllUsers(){
-        return userRepo.findAll()
-                .stream()
-                .map(UserDTO::new)
-                .collect(Collectors.toList());
+
+    public List<UserDTO> getAllUsers(Role role, String search, int limit) {
+        Pageable pageable = PageRequest.of(0, limit);
+        Page<User> usersPage;
+
+        if (role != null && search != null && !search.isBlank()) {
+            usersPage = userRepo.searchByRole(role, search, pageable);
+        } else if (role != null) {
+            usersPage = userRepo.findByRole(role, pageable);
+        } else if (search != null && !search.isBlank()) {
+            usersPage = userRepo.searchAllRoles(search, pageable);
+        } else {
+            usersPage = userRepo.findAll(pageable);
+        }
+
+        return usersPage.stream().map(UserDTO::new).collect(Collectors.toList());
+    }
+
+    public Map<String, Object> getUserSummary(Long id){
+        Optional<User> userOpt = userRepo.findById(id);
+        if (userOpt.isEmpty()) {
+            return ResponseUtil.error("User not found!");
+        }
+
+        UserSummaryDTO dto = new UserSummaryDTO(userOpt.get());
+        return ResponseUtil.success("User found!", dto);
+    }
+
+    public Map<String, Object> changeUserPassword(Long id, String oldPassword, String newPassword){
+        Optional<User> userOpt = userRepo.findById(id);
+        if (userOpt.isEmpty()) {
+            return ResponseUtil.error("User not found!");
+        }
+        User user = userOpt.get();
+
+        if(!passwordEncoder.matches(oldPassword, user.getPassword())){
+            return ResponseUtil.error("Old password is incorrect!");
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepo.save(user);
+
+        return ResponseUtil.success("Password changed successfully!");
+    }
+
+    public Map<String, Object> changePasswordForAdmin(Long id, Long adminId, String newPassword){
+        Optional<User> userOpt = userRepo.findById(id);
+        if (userOpt.isEmpty()) {
+            return ResponseUtil.error("User not found!");
+        }
+        User user = userOpt.get();
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepo.save(user);
+
+        userActionService.recordAction(user.getId(), "password_change", "Admin changed password for user", "Admin changed password for user", user.getFirstname(), user.getLastname());
+        return ResponseUtil.success("Password changed successfully!");
     }
 
 }

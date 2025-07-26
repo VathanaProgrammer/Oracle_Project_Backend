@@ -24,7 +24,7 @@ public class User implements UserDetails {
     private String username;
     private String email;
     private String password;
-
+    private String gender;
     @Enumerated(EnumType.STRING)
     private Role role; // STUDENT, TEACHER, ADMIN
 
@@ -80,6 +80,14 @@ public class User implements UserDetails {
 
     public String getProfilePicture() {
         return profilePicture;
+    }
+
+    public void setGender(String gender){
+        this.gender = gender;
+    }
+
+    public String getGender(){
+        return this.gender;
     }
 
     public List<UserSessionLog> getSessionLogs() {

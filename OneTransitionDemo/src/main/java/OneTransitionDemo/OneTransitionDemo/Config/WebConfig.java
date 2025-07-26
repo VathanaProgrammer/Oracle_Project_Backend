@@ -2,6 +2,7 @@ package OneTransitionDemo.OneTransitionDemo.Config;
 
 import OneTransitionDemo.OneTransitionDemo.Services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -33,6 +34,10 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Autowired
     private UserService userService;
+
+    @Value("${upload.path.profile}")
+    private String updatedProfilePath;
+
     @Autowired
     private CustomAuthenticationProvider customAuthenticationProvider;
 
@@ -44,8 +49,8 @@ public class WebConfig implements WebMvcConfigurer {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/user/register","/api/user/login","/api/uploads/profile/**", "/upload/**").permitAll()
                         .requestMatchers("/me", "/api/user/**","/api/user/logout" , "/chat/**","/api/exams/**", "/api/messages/**").authenticated()
-                        .requestMatchers("/api/actions/**", "/api/assignments/**").authenticated()
-                        .requestMatchers("/api/comments/**", "/api/likes/**").authenticated()
+                        .requestMatchers("/api/actions/**", "/api/assignments/**", "/api/students/**").authenticated()
+                        .requestMatchers("/api/beforeDetail/**", "/api/session-logs/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(customAuthenticationProvider)
@@ -66,10 +71,12 @@ public class WebConfig implements WebMvcConfigurer {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList(
                 "http://localhost:5173",
+                "http://localhost:3000",
                 "http://localhost:5174",
                 "http://192.168.18.61:5173",
                 "http://172.20.10.2:5173",
-                "http://192.168.12.174:5173"
+                "http://192.168.12.174:5173",
+                "https://bxvl7j9c-5173.asse.devtunnels.ms/"
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
@@ -83,7 +90,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/api/upload/profile/**")
-                .addResourceLocations("file:D:/spring/upload/profile/");
+                .addResourceLocations("file:" + updatedProfilePath + "/");
     }
 
 }

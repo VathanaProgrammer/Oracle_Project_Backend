@@ -5,7 +5,44 @@ public class loginRequest {
     private String password;
     private Boolean rememberMe;
 
-    public String getEmail(){
+    private String browser;
+    private String device;
+    private String deviceType;
+    private String location;
+
+    public String getBrowser() {
+        return this.browser;
+    }
+
+    public void setBrowser(String browser) {
+        this.browser = browser;
+    }
+
+    public String getDevice() {
+        return this.device;
+    }
+
+    public void setDevice(String device) {
+        this.device = device;
+    }
+
+    public String getDeviceType() {
+        return this.deviceType;
+    }
+
+    public void setDeviceType(String deviceType) {
+        this.deviceType = deviceType;
+    }
+
+    public String getLocation() {
+        return this.location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public String getEmail() {
         return this.email;
     }
 

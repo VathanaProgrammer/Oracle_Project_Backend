@@ -11,6 +11,10 @@ public class Student {
 
     private String name;
 
+    private Long year;
+
+    private Long batch;
+
     @OneToOne
     private User user;
 
@@ -22,8 +26,6 @@ public class Student {
     @ManyToOne
     private ClassGroup classGroup;
 
-    @ManyToOne
-    private Batch batch;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -40,6 +42,8 @@ public class Student {
     public ClassGroup getClassGroup() { return classGroup; }
     public void setClassGroup(ClassGroup classGroup) { this.classGroup = classGroup; }
 
-    public Batch getBatch() { return batch; }
-    public void setBatch(Batch batch) { this.batch = batch; }
+    public Long getBatch() { return batch; }
+    public void setBatch(Long batch) { this.batch = batch; }
+    public Long getYear() { return year; }
+    public void setYear(Long year) { this.year = year; }
 }
