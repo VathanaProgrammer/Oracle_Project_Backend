@@ -51,6 +51,12 @@
 			<artifactId>jackson-datatype-hibernate6</artifactId>
 			<version>2.19.0</version>
 		</dependency>
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20220320</version>
+		</dependency>
+
 
 		<!--		Oracle server DB-->
 		<dependency>
