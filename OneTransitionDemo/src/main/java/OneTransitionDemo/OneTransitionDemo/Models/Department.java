@@ -1,12 +1,9 @@
 package OneTransitionDemo.OneTransitionDemo.Models;
 
 import jakarta.persistence.*;
-<<<<<<< HEAD
 
 import java.util.HashSet;
 import java.util.Set;
-=======
->>>>>>> e99ab82641a5f2978ec2c7811e3d8817fc3ffdc6
 
 @Entity
 @Table( name = "TBL_DEPARTMENTS")
