@@ -10,7 +10,11 @@ import java.util.Set;
 @Table( name = "TBL_TEACHERS")
 public class Teacher {
     @Id
+<<<<<<< HEAD
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+=======
+    @GeneratedValue (strategy = GenerationType.IDENTITY)
+>>>>>>> e99ab82641a5f2978ec2c7811e3d8817fc3ffdc6
     private Long id;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)

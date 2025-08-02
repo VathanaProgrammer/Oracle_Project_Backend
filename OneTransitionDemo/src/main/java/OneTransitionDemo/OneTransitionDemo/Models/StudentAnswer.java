@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 @Table( name = "TBL_STUDENT_ANSWERS")
 public class StudentAnswer {
     @Id
-    @GeneratedValue
+    @GeneratedValue( strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
