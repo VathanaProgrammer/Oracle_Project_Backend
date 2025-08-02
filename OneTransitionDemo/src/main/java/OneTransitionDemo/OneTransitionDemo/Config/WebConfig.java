@@ -49,7 +49,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/user/register","/api/user/login","/api/uploads/profile/**", "/upload/**").permitAll()
                         .requestMatchers("/me", "/api/user/**","/api/user/logout" , "/chat/**","/api/exams/**", "/api/messages/**").authenticated()
-                        .requestMatchers("/api/actions/**", "/api/assignments/**", "/api/students/**").authenticated()
+                        .requestMatchers("/api/actions/**", "/api/assignments/**", "/api/students/**", "/api/teachers/**", "/api/admins/**").authenticated()
                         .requestMatchers("/api/beforeDetail/**", "/api/session-logs/**").authenticated()
                         .anyRequest().authenticated()
                 )

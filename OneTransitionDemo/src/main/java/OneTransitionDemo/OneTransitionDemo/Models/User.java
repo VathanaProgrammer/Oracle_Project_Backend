@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 
 @Entity
@@ -32,6 +33,10 @@ public class User implements UserDetails {
     private String lastname;
     private String phone;
     private String profilePicture;
+    private boolean isDeleted;
+
+    @Column(name = "last_route")
+    private String lastRoute;
 
     @OneToMany(mappedBy = "user")
     private List<UserSessionLog> sessionLogs;
@@ -96,6 +101,22 @@ public class User implements UserDetails {
 
     public void setSessionLogs(List<UserSessionLog> userSessionLogs){
         this.sessionLogs = userSessionLogs;
+    }
+
+    public String getLastRoute() {
+        return lastRoute;
+    }
+
+    public void setLastRoute(String lastRoute) {
+        this.lastRoute = lastRoute;
+    }
+
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
     }
 
     @Override

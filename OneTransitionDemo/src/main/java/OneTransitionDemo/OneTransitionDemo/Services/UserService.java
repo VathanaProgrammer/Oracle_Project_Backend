@@ -1,16 +1,14 @@
 package OneTransitionDemo.OneTransitionDemo.Services;
 
+import OneTransitionDemo.OneTransitionDemo.DTO.AdminDTO;
 import OneTransitionDemo.OneTransitionDemo.DTO.UserDTO;
 import OneTransitionDemo.OneTransitionDemo.DTO.UserSummaryDTO;
 import OneTransitionDemo.OneTransitionDemo.ENUMS.Role;
-import OneTransitionDemo.OneTransitionDemo.Models.Student;
-import OneTransitionDemo.OneTransitionDemo.Models.Teacher;
-import OneTransitionDemo.OneTransitionDemo.Models.User;
-import OneTransitionDemo.OneTransitionDemo.Models.UserAction;
-import OneTransitionDemo.OneTransitionDemo.Repositories.UserRepository;
-import OneTransitionDemo.OneTransitionDemo.Repositories.TeacherRepository;
-import OneTransitionDemo.OneTransitionDemo.Repositories.StudentRepository;
+import OneTransitionDemo.OneTransitionDemo.Models.*;
+import OneTransitionDemo.OneTransitionDemo.Repositories.*;
 import OneTransitionDemo.OneTransitionDemo.Response.ResponseUtil;
+import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -43,7 +41,12 @@ public class UserService implements UserDetailsService {
     @Value("${upload.path.profile}")
     private String uploadPath;
 
+    @Autowired
+    private DepartmentRepository departmentRepo;
+
     private final PasswordEncoder passwordEncoder;
+    @Autowired
+    private MajorRepository majorRepository;
 
     public UserService(UserRepository userRepo, TeacherRepository teacherRepo, StudentRepository studentRepo, PasswordEncoder passwordEncoder, UserActionService userActionService) {
         this.userRepo = userRepo;
@@ -67,49 +70,79 @@ public class UserService implements UserDetailsService {
         return userRepo.findByEmail((Email));
     }
 
-    public Map<String, Object> registerUser(String firstName, String lastName, String password, String role, String email, MultipartFile profileImage, String gender) throws IOException {
+    @Transactional
+    public Map<String, Object> registerUser(
+            String firstName,
+            String lastName,
+            String password,
+            String role,
+            String phone,
+            String email,
+            MultipartFile profileImage,
+            String gender,
+            List<Long> departments,
+            Long major,
+            Long year,
+            Long batch
+    ) throws IOException {
+
         if (userRepo.existsByEmail(email)) {
-            return ResponseUtil.error("This email is already use");
+            return ResponseUtil.error("Email already used");
         }
 
         User user = new User();
         user.setFirstname(firstName);
-        user.setGender(gender);
         user.setLastname(lastName);
+        user.setGender(gender);
+        user.setPhone(phone);
         user.setRole(Role.valueOf(role.toUpperCase()));
-        String encoder = passwordEncoder.encode(password);
-        user.setPassword(encoder);
+        user.setPassword(passwordEncoder.encode(password));
+        user.setDeleted(false);
         user.setEmail(email);
 
+        // Handle image
         if (profileImage != null && !profileImage.isEmpty()) {
             String filename = UUID.randomUUID() + "_" + profileImage.getOriginalFilename();
             Path uploadDir = Paths.get(uploadPath);
-            if (!Files.exists(uploadDir)) {
-                Files.createDirectories(uploadDir);
-            }
+            if (!Files.exists(uploadDir)) Files.createDirectories(uploadDir);
             Path imagePath = uploadDir.resolve(filename);
             Files.copy(profileImage.getInputStream(), imagePath, StandardCopyOption.REPLACE_EXISTING);
             user.setProfilePicture(filename);
         }
 
         User savedUser = userRepo.save(user);
+        userRepo.flush();
+        System.out.println("User ID = " + savedUser.getId()); // Make sure this prints a real ID!
 
-        // Handle role-specific creation
         switch (user.getRole()) {
             case TEACHER:
                 Teacher teacher = new Teacher();
-                teacher.setUser(savedUser);
+                System.out.println("user about to save: " + savedUser.getId());
+                teacher.setUser(savedUser);  // This sets ID implicitly via @MapsId
+
+                if (departments != null && !departments.isEmpty()) {
+                    List<Department> deptEntities = departmentRepo.findAllById(departments);
+                    for (Department dept : deptEntities) {
+                        teacher.addDepartment(dept);
+                    }
+                }
                 teacherRepo.save(teacher);
+
                 break;
+
 
             case STUDENT:
                 Student student = new Student();
                 student.setUser(savedUser);
+                student.setMajor(majorRepository.findById(major)
+                        .orElseThrow(() -> new IllegalArgumentException("Major not found")));
+                student.setBatch(batch);
+                student.setYear(year);
                 studentRepo.save(student);
                 break;
 
             case ADMIN:
-                // No extra entity needed
+                // No extra handling needed
                 break;
 
             default:
@@ -118,7 +151,6 @@ public class UserService implements UserDetailsService {
 
         return ResponseUtil.success("User registered successfully");
     }
-
 
 //    public List<UserDTO> getAllUsers() {
 //        List<User> users = userRepo.findAll();
@@ -272,6 +304,20 @@ public class UserService implements UserDetailsService {
 
         userActionService.recordAction(user.getId(), "password_change", "Admin changed password for user", "Admin changed password for user", user.getFirstname(), user.getLastname());
         return ResponseUtil.success("Password changed successfully!");
+    }
+
+    public Map<String, Object> getAdminById(Long id){
+        if(id == null){
+            return ResponseUtil.error("User not found!");
+        }
+
+        Optional<User> opAdmin = userRepo.findById(id);
+        if(opAdmin.isEmpty()){
+            return ResponseUtil.error("User not found!");
+        }
+
+        AdminDTO dto = new AdminDTO(opAdmin.get());
+        return ResponseUtil.success("User found!", dto);
     }
 
 }

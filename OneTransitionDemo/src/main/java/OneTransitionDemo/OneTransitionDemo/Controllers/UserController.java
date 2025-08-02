@@ -64,22 +64,61 @@ public class UserController {
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
 
+    @PostMapping("/last-route")
+    public ResponseEntity<?> saveLastRoute(@RequestBody Map<String, String> body,
+                                           @AuthenticationPrincipal User currentUser) {
+        String path = body.get("path");
+        System.out.println("save last path: " + path);
+        if (path != null && currentUser != null) {
+            currentUser.setLastRoute(path);
+            userRepository.save(currentUser);
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.badRequest().build();
+    }
+
+    // Get last route
+    @GetMapping("/last-route")
+    public ResponseEntity<?> getLastRoute(@AuthenticationPrincipal User user) {
+        String path = user.getLastRoute();
+
+        return ResponseEntity.ok(Collections.singletonMap("path", path));
+    }
+
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(
             @RequestParam("firstName") String firstName,
             @RequestParam("lastName") String lastName,
             @RequestParam("gender") String gender,
+            @RequestParam("phone") String phone,
             @RequestParam("role") String role,
             @RequestParam("email") String email,
             @RequestParam("password") String password,
-            @RequestParam(value = "profileImage", required = false) MultipartFile profileImage
+            @RequestParam(value = "profilePicture", required = false) MultipartFile profilePicture,
+            @RequestParam(value = "departments[]", required = false) List<Long> departments,
+            @RequestParam(value = "major", required = false) Long major,
+            @RequestParam(value = "year", required = false) Long year,
+            @RequestParam(value = "batch", required = false) Long batch
     ) throws IOException {
 
-        Map<String, Object> response;
-        response = userService.registerUser(firstName, lastName, password, role, email, profileImage, gender);
+        System.out.println("Received registration:");
+        System.out.println("firstName = " + firstName);
+        System.out.println("lastName = " + lastName);
+        System.out.println("gender = " + gender);
+        System.out.println("role = " + role);
+        System.out.println("email = " + email);
+        System.out.println("password = " + password);
+        System.out.println("profileImage = " + (profilePicture != null ? profilePicture.getOriginalFilename() : "null"));
+        System.out.println("departments = " + departments);
+
+        Map<String, Object> response = userService.registerUser(
+                firstName, lastName, password, role,phone, email, profilePicture, gender,
+                departments, major, year, batch
+        );
 
         return ResponseEntity.status((Boolean) response.get("success") ? 200 : 400).body(response);
     }
+
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody loginRequest loginRequest, HttpServletResponse response, HttpServletRequest request) {
@@ -99,6 +138,12 @@ public class UserController {
             System.out.println("Browser: " + browser);
 
             User user = userService.findByEmail(loginRequest.getEmail()).orElseThrow();
+            // ✅ Check if the user is marked as deleted
+            if (user.isDeleted()) {
+                return ResponseEntity
+                        .status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("message", "Account is deactivated"));
+            }
             System.out.println("LoginController: found user id:" +user.getId()+ "\n firstname: "+user.getFirstname()+"\n" +" lastname: "+ user.getLastname());
             System.out.println("Generate token...");
             long expiryMillis = loginRequest.getRememberMe() ?
@@ -237,7 +282,7 @@ public class UserController {
     public ResponseEntity<?> getCurrentUser(
             @AuthenticationPrincipal User user) {
 
-        if (user == null) {
+        if (user == null || user.isDeleted()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not authenticated");
         }
 
@@ -262,6 +307,8 @@ public class UserController {
                 "lastname", user.getLastname(),
                 "email", user.getEmail(),
                 "role", user.getRole(),
+                "gender", user.getGender(),
+                "isAuthenticated", true,
                 "timeSpentToday", todayFormatted,
                 "timeSpentThisWeek", weeklyFormatted
         );

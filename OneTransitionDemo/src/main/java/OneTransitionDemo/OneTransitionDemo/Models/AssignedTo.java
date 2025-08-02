@@ -21,6 +21,7 @@ public class AssignedTo {
     @JoinColumn( name = "subject_id")
     private Subject subject;
 
+    private String semester;
     private String shiftName;
     private String shiftTime;
     private int year;
@@ -85,5 +86,13 @@ public class AssignedTo {
 
     public Subject getSubject() {
         return subject;
+    }
+
+    public String getSemester() {
+        return semester;
+    }
+
+    public void setSemester(String semester) {
+        this.semester = semester;
     }
 }
