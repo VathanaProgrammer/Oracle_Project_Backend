@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 
@@ -29,12 +30,21 @@ public class StudentController {
     }
 
     @PutMapping("/update-for-admin")
-    public ResponseEntity<?> updateStuInfo(@AuthenticationPrincipal User user, @RequestBody StudentForAdminRequest request){
-        System.out.println("userId: " + request.getUserId());
-        Map<String, Object> response = studentService.updateForAdmin(request.getUserId(), request.getFirstName(), request.getLastName(),request.getEmail(), request.getPhone(), request.getGender());
+    public ResponseEntity<?> updateStuInfo(
+            @AuthenticationPrincipal User user,
+            @RequestParam("userId") Long userId,
+            @RequestParam("firstName") String firstName,
+            @RequestParam("lastName") String lastName,
+            @RequestParam("email") String email,
+            @RequestParam("phone") String phone,
+            @RequestParam("gender") String gender,
+            @RequestParam("majorId") Long majorId,
+            @RequestParam(value = "profilePicture", required = false) MultipartFile profilePicture
+    ) {
+        Map<String, Object> response = studentService.updateForAdmin(
+                userId, firstName, lastName, email, phone, gender, majorId, profilePicture
+        );
         return ResponseEntity.status((Boolean) response.get("success") ? 200 : 400).body(response);
     }
-
-
 
 }

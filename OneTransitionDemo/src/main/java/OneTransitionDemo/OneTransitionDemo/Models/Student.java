@@ -9,14 +9,16 @@ public class Student {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
     private String name;
 
     private Long year;
 
     private Long batch;
 
-    @OneToOne
-    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "major_id")

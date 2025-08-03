@@ -95,7 +95,7 @@ public class UserController {
             @RequestParam("email") String email,
             @RequestParam("password") String password,
             @RequestParam(value = "profilePicture", required = false) MultipartFile profilePicture,
-            @RequestParam(value = "departments[]", required = false) List<Long> departments,
+            @RequestParam(value = "departments", required = false) List<Long> departments,
             @RequestParam(value = "major", required = false) Long major,
             @RequestParam(value = "year", required = false) Long year,
             @RequestParam(value = "batch", required = false) Long batch
@@ -175,7 +175,7 @@ public class UserController {
 
             messagingTemplate.convertAndSend("/topic/api/actions/recent", recentAction);
 
-            return ResponseEntity.ok(token); // Return only the token
+            return ResponseEntity.ok(Map.of("success", true)); // Return only the token
         }  catch (BadCredentialsException ex) {             // <— Print full stack trace
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)
@@ -302,12 +302,12 @@ public class UserController {
         // Build response
         Map<String, Object> userData = Map.of(
                 "id", user.getId(),
-                "firstname", user.getFirstname(),
-                "profile", user.getProfilePicture(),
-                "lastname", user.getLastname(),
-                "email", user.getEmail(),
-                "role", user.getRole(),
-                "gender", user.getGender(),
+                "firstname", user.getFirstname() != null ? user.getFirstname() : "",
+                "profile", user.getProfilePicture() != null ? user.getProfilePicture() : "",
+                "lastname", user.getLastname() != null ? user.getLastname() : "",
+                "email", user.getEmail() != null ? user.getEmail() : "",
+                "role", user.getRole() != null ? user.getRole() : "",
+                "gender", user.getGender() != null ? user.getGender() : "",
                 "isAuthenticated", true,
                 "timeSpentToday", todayFormatted,
                 "timeSpentThisWeek", weeklyFormatted
