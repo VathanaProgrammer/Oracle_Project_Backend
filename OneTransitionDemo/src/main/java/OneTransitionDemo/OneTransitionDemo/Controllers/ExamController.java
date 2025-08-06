@@ -15,7 +15,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
-
+import java.util.stream.Collectors;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -155,4 +155,24 @@ public class ExamController {
         messagingTemplate.convertAndSend("/topic/api/actions/recent", dto);
         return ResponseEntity.status((Boolean) response.get("success") ? 200 : 400).body(response);
     }
+
+    @GetMapping("/all")
+    public List<ExamSummaryDTO> getAllExam( @AuthenticationPrincipal User user){
+        return examService.getAllExam();
+    }
+
+    @GetMapping("/test")
+    public List<ExamSummaryDTO> paddingExams() {
+        List<ExamSummaryDTO> examSummaryDTO = examService.Exams();
+        return examSummaryDTO;
+    }
+    @PutMapping("/canceled/{id}")
+    public ResponseEntity<?> cancelExam(@AuthenticationPrincipal User user,@PathVariable Long id){
+        Map<String, Object> response = examService.cancelExam(id);
+        return  ResponseEntity.status((Boolean)response.get("success") ? 200:400).body(response);
+    }
+
+
+
+
 }

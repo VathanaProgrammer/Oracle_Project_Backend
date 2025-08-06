@@ -9,6 +9,7 @@ import OneTransitionDemo.OneTransitionDemo.ENUMS.Status;
 import OneTransitionDemo.OneTransitionDemo.Models.*;
 import OneTransitionDemo.OneTransitionDemo.Repositories.*;
 import OneTransitionDemo.OneTransitionDemo.Response.ResponseUtil;
+import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.ManyToMany;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -178,5 +179,36 @@ public class ExamService {
 
         return ResponseUtil.success("Exam was successfully ended.");
     }
+
+    public List<ExamSummaryDTO> getAllExam(){
+        return examRepository.findAll()
+                .stream()
+                .map(ExamSummaryDTO::new)
+                .toList();
+    }
+
+    public List<ExamSummaryDTO> Exams(){
+        return examRepository.findByStatus(Status.PENDING)
+                .stream()
+                .map(ExamSummaryDTO::new)
+                .collect(Collectors.toList());
+    }
+    @Transactional
+    public Map<String, Object> cancelExam(Long id) {
+        Optional<Exam> optionalExam = examRepository.findById(id);
+
+        if (optionalExam.isEmpty()) {
+            return ResponseUtil.error("Exam not found!");
+        }
+
+        Exam exam = optionalExam.get();
+        exam.setStatus(Status.CANCELED);
+
+        // ✅ Force Hibernate to persist
+        examRepository.save(exam);
+
+        return ResponseUtil.success("Exam canceled");
+    }
+
 
 }
