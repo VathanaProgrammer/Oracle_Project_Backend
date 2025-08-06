@@ -7,6 +7,8 @@ import OneTransitionDemo.OneTransitionDemo.Models.StudentAnswer;
 import OneTransitionDemo.OneTransitionDemo.Repositories.QuestionRepository;
 import OneTransitionDemo.OneTransitionDemo.Repositories.StudentAnswerRepository;
 import OneTransitionDemo.OneTransitionDemo.Repositories.StudentRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.type.TypeReference;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -33,16 +35,22 @@ public class StudentAnswerController {
 
     @PostMapping(consumes = { "multipart/form-data" })
     public ResponseEntity<?> saveMultipleStudentAnswers(
-            @RequestPart("answers") List<StudentAnswerDTO> answersDTO,
-            @RequestPart(value = "files", required = false) MultipartFile[] files) {
+            @RequestPart("answers") String answersJson,
+            @RequestPart(value = "files", required = false) List<MultipartFile> files) {
         try {
-            // Map questionId -> file for quick lookup
+            // ✅ Manually parse JSON
+            ObjectMapper mapper = new ObjectMapper();
+            List<StudentAnswerDTO> answersList = mapper.readValue(
+                    answersJson,
+                    new TypeReference<List<StudentAnswerDTO>>() {}
+            );
+
+            // ✅ Map files to questionId
             Map<Long, MultipartFile> fileMap = new HashMap<>();
             if (files != null) {
                 for (MultipartFile file : files) {
                     String filename = file.getOriginalFilename();
                     if (filename != null) {
-                        // Expect filename like "123_somefile.jpg" where 123 = questionId
                         String[] parts = filename.split("_", 2);
                         Long questionId = Long.parseLong(parts[0]);
                         fileMap.put(questionId, file);
@@ -52,7 +60,7 @@ public class StudentAnswerController {
 
             List<StudentAnswer> savedAnswers = new ArrayList<>();
 
-            for (StudentAnswerDTO dto : answersDTO) {
+            for (StudentAnswerDTO dto : answersList) {
                 Long studentId = dto.getStudentDTO().getId();
                 Long questionId = dto.getQuestionDTO().getId();
 
@@ -68,7 +76,6 @@ public class StudentAnswerController {
                 answer.setAnswerContent(dto.getAnswerContent());
                 answer.setAnswerTrueFalse(dto.getAnswerTrueFalse());
 
-                // Save file if exists for this question
                 MultipartFile file = fileMap.get(questionId);
                 if (file != null && !file.isEmpty()) {
                     String savedFilePath = saveFile(file);
@@ -88,6 +95,7 @@ public class StudentAnswerController {
             return ResponseEntity.badRequest().body("Error saving answers: " + e.getMessage());
         }
     }
+
 
     // Helper method to save a file locally
     private String saveFile(MultipartFile file) throws IOException {

@@ -51,6 +51,7 @@ public class WebConfig implements WebMvcConfigurer {
                         .requestMatchers("/me", "/api/user/**","/api/user/logout" , "/chat/**","/api/exams/**", "/api/messages/**").authenticated()
                         .requestMatchers("/api/actions/**", "/api/assignments/**", "/api/students/**", "/api/teachers/**", "/api/admins/**").authenticated()
                         .requestMatchers("/api/beforeDetail/**", "/api/session-logs/**").authenticated()
+                        .requestMatchers("/api/answers/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(customAuthenticationProvider)
