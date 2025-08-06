@@ -1,5 +1,5 @@
 package OneTransitionDemo.OneTransitionDemo.ENUMS;
 
 public enum Status {
-    DRAFT, PUBLISHED, EXPIRED, CANCELED, ENDED
+    DRAFT, PUBLISHED,PENDING ,EXPIRED, CANCELED, ENDED
 }

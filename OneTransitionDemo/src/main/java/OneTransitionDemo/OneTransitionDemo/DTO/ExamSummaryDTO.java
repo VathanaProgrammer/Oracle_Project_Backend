@@ -15,6 +15,8 @@ public class ExamSummaryDTO {
     private String duration;
     private String deadline;
     private String status;
+    private String title;
+    private String description;
 
     public ExamSummaryDTO(Exam exam) {
         this.id = exam.getId();
@@ -26,6 +28,8 @@ public class ExamSummaryDTO {
         this.status = exam.getStatus().toString();
         this.duration = Duration.between(exam.getStartTime(), exam.getEndTime()).toMinutes() + " mins";
         this.type = exam.getType(); // quiz / file / startable etc.
+        this.title = exam.getTitle();
+        this.description = exam.getDescription();
     }
 
     // Getters (or use Lombok @Getter)
@@ -38,6 +42,8 @@ public class ExamSummaryDTO {
     public String getDuration() { return duration; }
     public ExamType getType() { return type; }
     public Long getId() { return id; }
+    public String getDescription(){ return this.description;}
+    public String getTitle(){return this.title;}
 
     public String getStatus() {
         return status;

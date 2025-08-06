@@ -63,4 +63,13 @@ public class ExamDTO {
     public String getStatus(){ return status; }
 
     public void setStatus(String status){ this.status = status; }
+    private String teacherProfilePicture;
+
+    public String getTeacherProfilePicture() {
+        return teacherProfilePicture;
+    }
+    public void setTeacherProfilePicture(String teacherProfilePicture) {
+        this.teacherProfilePicture = teacherProfilePicture;
+    }
+
 }

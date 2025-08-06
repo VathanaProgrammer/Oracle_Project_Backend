@@ -1,22 +1,33 @@
 package OneTransitionDemo.OneTransitionDemo.Models;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
-@Table( name = "TBL_STUDENT_ANSWERS")
+@Table(name = "TBL_STUDENT_ANSWERS")
 public class StudentAnswer {
+
     @Id
-    @GeneratedValue( strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    // Many answers belong to one student
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "student_id", nullable = false)
     private Student student;
 
-    @ManyToOne
+    // Many answers belong to one question
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "question_id", nullable = false)
     private Question question;
 
-    @ManyToOne
-    private AnswerOption selectedOption;
+    private Long answerIndex;
+    private String answerContent;
+    private boolean answerTrueFalse;
+    private String answerFilePath;
+    private LocalDateTime submitAt;
+
+    // === Getters and Setters ===
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -27,7 +38,18 @@ public class StudentAnswer {
     public Question getQuestion() { return question; }
     public void setQuestion(Question question) { this.question = question; }
 
-    public AnswerOption getSelectedOption() { return selectedOption; }
-    public void setSelectedOption(AnswerOption selectedOption) { this.selectedOption = selectedOption; }
-}
+    public Long getAnswerIndex() { return answerIndex; }
+    public void setAnswerIndex(Long answerIndex) { this.answerIndex = answerIndex; }
 
+    public String getAnswerContent() { return answerContent; }
+    public void setAnswerContent(String answerContent) { this.answerContent = answerContent; }
+
+    public Boolean getAnswerTrueFalse() { return answerTrueFalse; }
+    public void setAnswerTrueFalse(Boolean answerTrueFalse) { this.answerTrueFalse = answerTrueFalse; }
+
+    public String getAnswerFilePath() { return answerFilePath; }
+    public void setAnswerFilePath(String answerFilePath) { this.answerFilePath = answerFilePath; }
+
+    public LocalDateTime getSubmitAt() { return submitAt; }
+    public void setSubmitAt(LocalDateTime submitAt) { this.submitAt = submitAt; }
+}
