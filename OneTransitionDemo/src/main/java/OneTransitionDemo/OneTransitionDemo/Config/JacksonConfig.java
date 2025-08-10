@@ -9,11 +9,13 @@ import org.springframework.context.annotation.Configuration;
 import com.fasterxml.jackson.datatype.hibernate6.Hibernate6Module;
 @Configuration
 public class JacksonConfig {
+
     @Bean
     public Jackson2ObjectMapperBuilderCustomizer jacksonCustomizer() {
         return builder -> {
-            builder.modules(new JavaTimeModule(), new Hibernate6Module());
+            builder.modules(new JavaTimeModule());
             builder.featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         };
     }
 }
+

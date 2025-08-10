@@ -15,10 +15,8 @@ import java.time.LocalDateTime;
 
 @Service
 public class StudentAnswerService {
-
     @Autowired
     private StudentRepository studentRepository;
-
     @Autowired
     private QuestionRepository questionRepository;
 
@@ -29,12 +27,11 @@ public class StudentAnswerService {
     public void saveStudentAnswer(Long studentId, Long questionId, StudentAnswerDTO dto) {
 
         // 🔍 Step 1: Validate student and question
-        Student student = studentRepository.findById(studentId)
+        Student student = studentRepository.findByUserId(studentId)
                 .orElseThrow(() -> new RuntimeException("Student with ID " + studentId + " not found"));
 
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new RuntimeException("Question with ID " + questionId + " not found"));
-
         // 🔒 Step 2: Validate answer based on question type
         String type = question.getType(); // Expected: "true_false", "multiple_choice", "short_answer", "file_exam"
 
@@ -71,7 +68,6 @@ public class StudentAnswerService {
         answer.setAnswerTrueFalse(dto.getAnswerTrueFalse());
         answer.setAnswerFilePath(dto.getAnswerFilePath());
         answer.setSubmitAt(LocalDateTime.now());
-
         // 💾 Step 4: Save to DB
         studentAnswerRepository.save(answer);
     }

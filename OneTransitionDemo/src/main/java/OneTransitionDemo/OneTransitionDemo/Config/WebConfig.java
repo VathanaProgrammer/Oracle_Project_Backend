@@ -60,7 +60,18 @@ public class WebConfig implements WebMvcConfigurer {
         return http.build();
     }
 
-
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/**")
+                        .allowedOrigins("http://localhost:3000") // adjust to your frontend origin
+                        .allowedMethods("*")
+                        .allowCredentials(true); // ✅ allow cookies
+            }
+        };
+    }
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception{
         return config.getAuthenticationManager();

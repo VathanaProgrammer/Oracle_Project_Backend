@@ -1,6 +1,8 @@
 package OneTransitionDemo.OneTransitionDemo.Models;
 
+import OneTransitionDemo.OneTransitionDemo.DTO.StudentAnswerDTO;
 import jakarta.persistence.*;
+import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 
 @Entity
@@ -23,11 +25,10 @@ public class StudentAnswer {
 
     private Long answerIndex;
     private String answerContent;
-    private boolean answerTrueFalse;
+    private Boolean answerTrueFalse;
     private String answerFilePath;
     private LocalDateTime submitAt;
 
-    // === Getters and Setters ===
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -52,4 +53,5 @@ public class StudentAnswer {
 
     public LocalDateTime getSubmitAt() { return submitAt; }
     public void setSubmitAt(LocalDateTime submitAt) { this.submitAt = submitAt; }
+
 }
