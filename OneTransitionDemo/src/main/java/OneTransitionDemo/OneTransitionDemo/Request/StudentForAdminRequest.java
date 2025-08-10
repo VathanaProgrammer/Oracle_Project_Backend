@@ -9,7 +9,7 @@ public class StudentForAdminRequest {
     private String gender;
     private String role;
     private String batch;
-    private String major;
+    private long major;
     private String year;
     private String phone;
 
@@ -77,11 +77,11 @@ public class StudentForAdminRequest {
         this.batch = batch;
     }
 
-    public String getMajor() {
+    public Long getMajor() {
         return major;
     }
 
-    public void setMajor(String major) {
+    public void setMajor(long major) {
         this.major = major;
     }
 

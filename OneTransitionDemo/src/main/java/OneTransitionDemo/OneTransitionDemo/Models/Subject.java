@@ -13,7 +13,29 @@ public class Subject {
 
     private String name;
 
+    private Boolean isDeleted;
+
     // Getters and Setters
+
+    @ManyToOne
+    @JoinColumn(name = "major_id")
+    private Major major;
+
+    public Major getMajor() {
+        return major;
+    }
+
+    public void setMajor(Major major) {
+        this.major = major;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        isDeleted = deleted;
+    }
+
+    public Boolean getDeleted() {
+        return isDeleted;
+    }
 
     public String getName(){
         return this.name;

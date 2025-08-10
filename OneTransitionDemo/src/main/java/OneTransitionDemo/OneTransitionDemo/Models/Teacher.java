@@ -1,5 +1,7 @@
 package OneTransitionDemo.OneTransitionDemo.Models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.util.HashSet;
@@ -14,13 +16,14 @@ public class Teacher {
     private Long id;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "userId")
     private User user;
 
     @OneToMany(mappedBy = "teacher")
     private List<Exam> examsCreated;
 
     @ManyToMany(mappedBy = "teachers")
+    @JsonBackReference
     private Set<Department> departments = new HashSet<>();
 
     @Version

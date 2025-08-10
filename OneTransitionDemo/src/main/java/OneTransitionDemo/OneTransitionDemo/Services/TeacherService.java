@@ -1,5 +1,6 @@
 package OneTransitionDemo.OneTransitionDemo.Services;
 
+import OneTransitionDemo.OneTransitionDemo.DTO.TeacherAdminDTO;
 import OneTransitionDemo.OneTransitionDemo.DTO.TeacherDTO;
 import OneTransitionDemo.OneTransitionDemo.ENUMS.Role;
 import OneTransitionDemo.OneTransitionDemo.Models.Department;
@@ -115,6 +116,16 @@ public class TeacherService {
         userRepository.save(user);
 
         return ResponseUtil.success("Teacher information updated successfully!");
+    }
+
+    public Map<String, Object> getTeacherToAddWithDepartment(){
+        List<TeacherAdminDTO> teachers = teacherRepository.findAll()
+                .stream()
+                .filter(teacher -> teacher.getUser() != null && !teacher.getUser().isDeleted())
+                .map(TeacherAdminDTO::new)
+                .toList();
+
+        return ResponseUtil.success("Teacher information updated successfully!", teachers);
     }
 
 }

@@ -5,10 +5,16 @@ import OneTransitionDemo.OneTransitionDemo.Models.Major;
 public class MajorDTO {
     private Long id;
     private String name;
+    private String departmentName;
 
     public MajorDTO(Major major) {
         this.id = major.getId();
         this.name = major.getName();
+        this.departmentName = major.getDepartment().getName();
+    }
+
+    public String getDepartmentName() {
+        return departmentName;
     }
 
     public Long getId() {

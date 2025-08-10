@@ -3,14 +3,14 @@ package OneTransitionDemo.OneTransitionDemo.Controllers;
 import OneTransitionDemo.OneTransitionDemo.ENUMS.Role;
 import OneTransitionDemo.OneTransitionDemo.Models.User;
 import OneTransitionDemo.OneTransitionDemo.Repositories.UserRepository;
+import OneTransitionDemo.OneTransitionDemo.Request.AdminDepartmentRequest;
+import OneTransitionDemo.OneTransitionDemo.Services.AdminDepartmentService;
+import OneTransitionDemo.OneTransitionDemo.Services.TeacherService;
 import OneTransitionDemo.OneTransitionDemo.Services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +25,10 @@ public class AdminController {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private TeacherService teacherService;
+    @Autowired
+    private AdminDepartmentService adminDepartmentService;
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getAdminInfo(@AuthenticationPrincipal User user,@PathVariable Long id){
@@ -62,5 +66,15 @@ public class AdminController {
         return result;
     }
 
+    @GetMapping("/getTeacherForAddingDepartment")
+    public ResponseEntity<?> getTeacherForAddingDepartment(){
+        Map<String, Object> response = teacherService.getTeacherToAddWithDepartment();
+        return ResponseEntity.status((Boolean) response.get("success") ? 200 : 400).body(response);
+    }
 
+    @PostMapping("/createDepartment")
+    public ResponseEntity<?> createDepartment(@AuthenticationPrincipal User user, @RequestBody AdminDepartmentRequest request){
+        Map<String, Object> res = adminDepartmentService.createDepartmentWithAcceptNullTeacherOrMajor(request);
+        return ResponseEntity.status((Boolean) res.get("success") ? 200 : 400).body(res);
+    }
 }
