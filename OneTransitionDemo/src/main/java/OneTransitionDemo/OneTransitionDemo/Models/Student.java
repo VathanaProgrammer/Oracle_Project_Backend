@@ -9,25 +9,35 @@ public class Student {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String name;
+
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    private String name;
-
-    private Long year;
-
-    private Long batch;
-
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "major_id")
-    private Major major;
-
+    // Academic info (linked entities)
+    @ManyToOne
+    @JoinColumn(name = "batch_id")
+    private Batch batch;          // e.g. 2025 Intake
 
     @ManyToOne
-    private ClassGroup classGroup;
+    @JoinColumn(name = "semester_id")
+    private Semester semester;    // e.g. Semester 1
 
+    @ManyToOne
+    @JoinColumn(name = "shift_id")
+    private Shift shift;          // Morning / Evening
+
+    @ManyToOne
+    @JoinColumn(name = "major_id")
+    private Major major;          // e.g. Computer Science
+
+    @ManyToOne
+    @JoinColumn(name = "location_id")
+    private Location location;  // e.g. Room A-101
+
+    // Other info
+    private Long year;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -41,11 +51,15 @@ public class Student {
     public Major getMajor() { return major; }
     public void setMajor(Major major) { this.major = major; }
 
-    public ClassGroup getClassGroup() { return classGroup; }
-    public void setClassGroup(ClassGroup classGroup) { this.classGroup = classGroup; }
+    public Location getLocation() { return location; }
+    public void setLocation(Location location) { this.location = location; }
 
-    public Long getBatch() { return batch; }
-    public void setBatch(Long batch) { this.batch = batch; }
+    public Batch getBatch() { return batch; }
+    public void setBatch(Batch batch) { this.batch = batch; }
     public Long getYear() { return year; }
     public void setYear(Long year) { this.year = year; }
+    public Semester getSemester() { return semester; }
+    public void setSemester(Semester semester) { this.semester = semester; }
+    public Shift getShift() { return shift; }
+    public void setShift(Shift shift) { this.shift = shift; }
 }

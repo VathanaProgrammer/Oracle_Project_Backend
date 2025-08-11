@@ -48,6 +48,16 @@ public class UserService implements UserDetailsService {
     @Autowired
     private MajorRepository majorRepository;
 
+    @Autowired
+    private BatchRepository batchRepository;
+
+    @Autowired
+    private SemesterRepository semesterRepository;
+    @Autowired
+    private ShiftRepository shiftRepository;
+    @Autowired
+    private LocationRepository locationRepository;
+
     public UserService(UserRepository userRepo, TeacherRepository teacherRepo, StudentRepository studentRepo, PasswordEncoder passwordEncoder, UserActionService userActionService) {
         this.userRepo = userRepo;
         this.teacherRepo = teacherRepo;
@@ -83,7 +93,10 @@ public class UserService implements UserDetailsService {
             List<Long> departments,
             Long major,
             Long year,
-            Long batch
+            Long batch,
+            Long semester,
+            Long shift,
+            Long location
     ) throws IOException {
 
         if (userRepo.existsByEmail(email)) {
@@ -134,12 +147,39 @@ public class UserService implements UserDetailsService {
             case STUDENT:
                 Student student = new Student();
                 student.setUser(savedUser);
-                student.setMajor(majorRepository.findById(major)
-                        .orElseThrow(() -> new IllegalArgumentException("Major not found")));
-                student.setBatch(batch);
+
+                // Set Major
+                student.setMajor(
+                        majorRepository.findById(major)
+                                .orElseThrow(() -> new IllegalArgumentException("Major not found"))
+                );
+
+                // Set Batch
+                student.setBatch(
+                        batchRepository.findById(batch)
+                                .orElseThrow(() -> new IllegalArgumentException("Batch not found"))
+                );
+
+                // Set Year
                 student.setYear(year);
+
+                // Optional: set default semester or other properties
+                student.setSemester(
+                        semesterRepository.findById(semester) // example if you want to default semester
+                                .orElseThrow(() -> new IllegalArgumentException("Semester not found"))
+                );
+
+                student.setShift(shiftRepository.findById(shift)
+                                .orElseThrow(() -> new IllegalArgumentException("Shift not found"))
+                );
+
+                student.setLocation(locationRepository.findById(location)
+                                .orElseThrow(() -> new IllegalArgumentException("Location not found"))
+                );
+
                 studentRepo.save(student);
                 break;
+
 
             case ADMIN:
                 // No extra handling needed

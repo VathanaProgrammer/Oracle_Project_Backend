@@ -98,7 +98,10 @@ public class UserController {
             @RequestParam(value = "departments", required = false) List<Long> departments,
             @RequestParam(value = "major", required = false) Long major,
             @RequestParam(value = "year", required = false) Long year,
-            @RequestParam(value = "batch", required = false) Long batch
+            @RequestParam(value = "batch", required = false) Long batch,
+            @RequestParam(value = "semester", required = false) Long semester,
+            @RequestParam(value = "shift", required = false) Long shift,
+            @RequestParam(value = "location", required = false) Long location
     ) throws IOException {
 
         System.out.println("Received registration:");
@@ -113,7 +116,7 @@ public class UserController {
 
         Map<String, Object> response = userService.registerUser(
                 firstName, lastName, password, role,phone, email, profilePicture, gender,
-                departments, major, year, batch
+                departments, major, year, batch, semester, shift, location
         );
 
         return ResponseEntity.status((Boolean) response.get("success") ? 200 : 400).body(response);

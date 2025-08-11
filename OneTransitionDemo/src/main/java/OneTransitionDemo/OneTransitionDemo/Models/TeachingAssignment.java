@@ -20,5 +20,14 @@ public class TeachingAssignment {
     public AssignedTo getAssignedTo() {
         return this.assignedTo;
     }
+    public void setAssignedTo(AssignedTo assignedTo) {
+        this.assignedTo = assignedTo;
+    }
+    public User getTeacher() {
+        return this.teacher;
+    }
+    public void setTeacher(User teacher) {
+        this.teacher = teacher;
+    }
 }
 

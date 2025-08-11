@@ -31,7 +31,7 @@ public class DepartmentService {
         return ResponseUtil.success("Departments found!", dtoList);
     }
     public List<DepartmentSummaryDTO> getDepartmentsWithTeachersAndMajors() {
-        List<Department> departments = departmentRepository.findAll();
+        List<Department> departments = departmentRepository.findByIsDeletedFalse();
 
         return departments.stream().map(dept -> {
             DepartmentSummaryDTO dto = new DepartmentSummaryDTO();

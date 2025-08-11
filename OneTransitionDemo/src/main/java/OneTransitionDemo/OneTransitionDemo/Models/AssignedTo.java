@@ -2,6 +2,8 @@ package OneTransitionDemo.OneTransitionDemo.Models;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
+
 @Entity
 @Table( name = "TBL_ASSIGN_TO")
 public class AssignedTo {
@@ -10,21 +12,35 @@ public class AssignedTo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private int batch;
-    private String location;
+    @ManyToOne
+    @JoinColumn(name = "batch_id")
+    private Batch batch;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
+    @JoinColumn(name = "semester_id")
+    private Semester semester;
+
+    @ManyToOne
+    @JoinColumn(name = "shift_id")
+    private Shift shift;
+
+    @ManyToOne
     @JoinColumn(name = "major_id")
     private Major major;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn( name = "subject_id")
+    @ManyToOne
+    @JoinColumn(name = "subject_id")
     private Subject subject;
 
-    private String semester;
-    private String shiftName;
-    private String shiftTime;
-    private int year;
+    @ManyToOne
+    @JoinColumn(name = "location_id")
+    private Location location;
+
+    @ManyToOne
+    @JoinColumn(name = "year_id")
+    private AcademicYear academicYear;
+
+
 
     // Getters and setters
 
@@ -36,19 +52,19 @@ public class AssignedTo {
         this.id = id;
     }
 
-    public int getBatch() {
+    public Batch getBatch() {
         return batch;
     }
 
-    public void setBatch(int batch) {
+    public void setBatch(Batch batch) {
         this.batch = batch;
     }
 
-    public String getLocation() {
+    public Location getLocation() {
         return location;
     }
 
-    public void setLocation(String location) {
+    public void setLocation(Location location) {
         this.location = location;
     }
 
@@ -60,39 +76,30 @@ public class AssignedTo {
         this.major = major;
     }
 
-    public String getShiftName() {
-        return shiftName;
+    public Shift getShift() {
+        return shift;
     }
 
-    public void setShiftName(String shiftName) {
-        this.shiftName = shiftName;
+    public void setShift(Shift shift) {
+        this.shift = shift;
     }
 
-    public String getShiftTime() {
-        return shiftTime;
+    public AcademicYear getAcademicYear() {
+        return academicYear;
     }
-
-    public void setShiftTime(String shiftTime) {
-        this.shiftTime = shiftTime;
-    }
-
-    public int getYear() {
-        return year;
-    }
-
-    public void setYear(int year) {
-        this.year = year;
+    public void setAcademicYear(AcademicYear academicYear) {
+        this.academicYear = academicYear;
     }
 
     public Subject getSubject() {
         return subject;
     }
 
-    public String getSemester() {
+    public Semester getSemester() {
         return semester;
     }
 
-    public void setSemester(String semester) {
+    public void setSemester(Semester semester) {
         this.semester = semester;
     }
 }

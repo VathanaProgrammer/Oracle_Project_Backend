@@ -22,19 +22,7 @@ public class TeachingAssignmentService {
         List<TeachingAssignment> teachingAssignments = teachingAssignmentRepository.findByTeacherId(teacherId);
 
         return teachingAssignments.stream()
-                .map(ta -> {
-                    AssignedTo assigned = ta.getAssignedTo(); // ✅ get from TeachingAssignment
-                    AssignedToDTO dto = new AssignedToDTO();
-                    dto.setId(assigned.getId());
-                    dto.setBatch(assigned.getBatch());
-                    dto.setYear(assigned.getYear());
-                    dto.setLocation(assigned.getLocation());
-                    dto.setShiftName(assigned.getShiftName());
-                    dto.setShiftTime(assigned.getShiftTime());
-                    dto.setMajor(assigned.getMajor().getName());
-                    return dto;
-                })
+                .map(ta -> new AssignedToDTO(ta.getAssignedTo())) // ✅ use your DTO constructor
                 .collect(Collectors.toList());
     }
-
 }

@@ -12,4 +12,6 @@ public interface DepartmentRepository extends JpaRepository<Department, Long> {
     @Query("SELECT d FROM Department d LEFT JOIN FETCH d.teachers t")
     List<Department> findAllWithTeachers();
 
+    List<Department> findByIsDeletedFalse();
+
 }

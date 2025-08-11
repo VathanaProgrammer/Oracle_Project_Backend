@@ -4,8 +4,16 @@ import OneTransitionDemo.OneTransitionDemo.Models.AssignedTo;
 
 public class AssignedToDTO {
     private Long id;
-    private int batch;
-    private int year;
+    private String batch;
+    private Long batchId;
+    private Long semesterId;
+    private Long semesterNumber;
+    private Long shiftId;
+    private Long subjectId;
+    private Long locationId;
+    private Long majorId;
+    private Long academicYearId;
+    private String year;
     private String location;
     private String shiftName;
     private String shiftTime;
@@ -17,12 +25,28 @@ public class AssignedToDTO {
 
     public AssignedToDTO(AssignedTo assignedTo) {
         this.id = assignedTo.getId();
-        this.shiftName = assignedTo.getShiftName();
-        this.shiftTime = assignedTo.getShiftTime();
-        this.location = assignedTo.getLocation();
-        this.batch = assignedTo.getBatch();
-        this.year = assignedTo.getYear();
+
+        this.shiftId = assignedTo.getShift().getId();
+        this.shiftName = assignedTo.getShift().getName() != null ? assignedTo.getShift().getName() : null;
+        this.shiftTime = assignedTo.getShift().getStartTime() + " - " + assignedTo.getShift().getEndTime();
+
+        this.locationId = assignedTo.getLocation().getId();
+        this.location = assignedTo.getLocation().getRomeName();
+
+        this.batchId = assignedTo.getBatch().getId();
+        this.batch = assignedTo.getBatch().getStartYear() + " - "+  assignedTo.getBatch().getEndYear();
+
+        this.academicYearId = assignedTo.getAcademicYear().getId();
+        this.year = assignedTo.getAcademicYear().getName();
+
+        this.semesterId = assignedTo.getSemester().getId();
+        this.semesterNumber = assignedTo.getSemester().getNumber();
+        this.subjectId = assignedTo.getSubject().getId();
+
+        this.majorId = assignedTo.getMajor().getId();
         this.major = assignedTo.getMajor() != null ? assignedTo.getMajor().getName() : null;
+
+        this.semesterId = assignedTo.getSemester().getId();
         this.subjectName = assignedTo.getSubject().getName() != null ? assignedTo.getSubject().getName() : null;
     }
     // Getters and setters
@@ -33,17 +57,17 @@ public class AssignedToDTO {
         this.id = id;
     }
 
-    public int getBatch() {
+    public String getBatch() {
         return batch;
     }
-    public void setBatch(int batch) {
+    public void setBatch(String batch) {
         this.batch = batch;
     }
 
-    public int getYear() {
+    public String getYear() {
         return year;
     }
-    public void setYear(int year) {
+    public void setYear(String year) {
         this.year = year;
     }
 

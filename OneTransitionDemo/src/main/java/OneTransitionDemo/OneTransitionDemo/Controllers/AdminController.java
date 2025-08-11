@@ -4,7 +4,9 @@ import OneTransitionDemo.OneTransitionDemo.ENUMS.Role;
 import OneTransitionDemo.OneTransitionDemo.Models.User;
 import OneTransitionDemo.OneTransitionDemo.Repositories.UserRepository;
 import OneTransitionDemo.OneTransitionDemo.Request.AdminDepartmentRequest;
+import OneTransitionDemo.OneTransitionDemo.Request.AdminMajorRequest;
 import OneTransitionDemo.OneTransitionDemo.Services.AdminDepartmentService;
+import OneTransitionDemo.OneTransitionDemo.Services.AdminMajorService;
 import OneTransitionDemo.OneTransitionDemo.Services.TeacherService;
 import OneTransitionDemo.OneTransitionDemo.Services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +31,8 @@ public class AdminController {
     private TeacherService teacherService;
     @Autowired
     private AdminDepartmentService adminDepartmentService;
+    @Autowired
+    private AdminMajorService adminMajorService;
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getAdminInfo(@AuthenticationPrincipal User user,@PathVariable Long id){
@@ -76,5 +80,23 @@ public class AdminController {
     public ResponseEntity<?> createDepartment(@AuthenticationPrincipal User user, @RequestBody AdminDepartmentRequest request){
         Map<String, Object> res = adminDepartmentService.createDepartmentWithAcceptNullTeacherOrMajor(request);
         return ResponseEntity.status((Boolean) res.get("success") ? 200 : 400).body(res);
+    }
+
+    @PostMapping("/createMajor")
+    public ResponseEntity<?> createMajor(@AuthenticationPrincipal User user, @RequestBody AdminMajorRequest request){
+        Map<String, Object> response = adminMajorService.createMajor(request);
+        return ResponseEntity.status((Boolean) response.get("success") ? 200 : 400).body(response);
+    }
+
+    @PutMapping("/updateMajor")
+    public ResponseEntity<?> updateMajor(@AuthenticationPrincipal User user, @RequestBody AdminMajorRequest request){
+        Map<String, Object> response = adminMajorService.updateMajor(request);
+        return ResponseEntity.status((Boolean) response.get("success") ? 200 : 400).body(response);
+    }
+
+    @DeleteMapping("/deleteMajor/{id}")
+    public ResponseEntity<?> deleteMajor(@AuthenticationPrincipal User user, @PathVariable Long id){
+        Map<String, Object> response = adminMajorService.deleteMajor(id);
+        return ResponseEntity.status((Boolean) response.get("success") ? 200 : 400).body(response);
     }
 }

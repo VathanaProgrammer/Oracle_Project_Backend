@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -23,9 +24,11 @@ public class User implements UserDetails {
     private Long id;
 
     private String username;
+    private LocalDate dob;
     private String email;
     private String password;
     private String gender;
+    private String address;
     @Enumerated(EnumType.STRING)
     private Role role; // STUDENT, TEACHER, ADMIN
 
@@ -46,6 +49,18 @@ public class User implements UserDetails {
 
     @OneToMany(mappedBy = "user")
     private List<Notification> notifications;
+
+    public List<ExamResult> getExamResults() { return examResults; }
+    public void setExamResults(List<ExamResult> examResults) { this.examResults = examResults; }
+
+    public List<Notification> getNotifications() { return notifications; }
+    public void setNotifications(List<Notification> notifications) { this.notifications = notifications; }
+
+    public LocalDate getDob() { return dob; }
+    public void setDob(LocalDate dob) { this.dob = dob; }
+
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
