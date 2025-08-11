@@ -17,9 +17,11 @@ public class StudentDTO {
     private String profilePicture;
     private String major;     // Assuming Major has getName()
     private String classGroup; // Assuming ClassGroup has getName()
-    private String batch;      // Assuming Batch has getName()
-
+    private String batch;
+    public StudentDTO() {
+    }// Assuming Batch has getName()
     public StudentDTO(Student student) {
+        this.id = student.getId();
         this.name = student.getUser().getFirstname() + " " + student.getUser().getLastname();
         this.userId = student.getUser().getId();
         this.firstname = student.getUser().getFirstname();

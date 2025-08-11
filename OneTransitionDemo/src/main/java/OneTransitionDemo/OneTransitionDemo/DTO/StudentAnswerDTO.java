@@ -24,7 +24,7 @@ public class StudentAnswerDTO {
         this.answerContent = answerContent;
     }
 
-    public Boolean getAnswerTrueFalse() { // ✅ use get
+    public Boolean getAnswerTrueFalse() {
         return answerTrueFalse;
     }
 
