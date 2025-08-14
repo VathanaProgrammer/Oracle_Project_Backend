@@ -1,12 +1,8 @@
 package OneTransitionDemo.OneTransitionDemo.Services;
 
 import OneTransitionDemo.OneTransitionDemo.DTO.StudentDTO;
-import OneTransitionDemo.OneTransitionDemo.Models.Major;
-import OneTransitionDemo.OneTransitionDemo.Models.Student;
-import OneTransitionDemo.OneTransitionDemo.Models.User;
-import OneTransitionDemo.OneTransitionDemo.Repositories.MajorRepository;
-import OneTransitionDemo.OneTransitionDemo.Repositories.StudentRepository;
-import OneTransitionDemo.OneTransitionDemo.Repositories.UserRepository;
+import OneTransitionDemo.OneTransitionDemo.Models.*;
+import OneTransitionDemo.OneTransitionDemo.Repositories.*;
 import OneTransitionDemo.OneTransitionDemo.Response.ResponseUtil;
 import org.hibernate.annotations.NotFound;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +30,23 @@ public class StudentService {
     private StudentRepository studentRepository;
 
     @Autowired
+    private LocationRepository locationRepository;
+
+    @Autowired
+    private SemesterRepository semesterRepository;
+
+    @Autowired
+    private TeacherRepository teacherRepository;
+
+    @Autowired
+    private BatchRepository  batchRepository;
+
+    @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private ShiftRepository shiftRepository;
+
     @Autowired
     private MajorRepository majorRepository;
 
@@ -58,7 +70,7 @@ public class StudentService {
         return ResponseUtil.success("Student found!", student);
     }
 
-    public Map<String, Object> updateForAdmin(Long userId, String firstName, String lastName, String email, String phone, String gender, Long major, MultipartFile profileImage) {
+    public Map<String, Object> updateForAdmin(Long userId, String firstName, String lastName, String email, String phone, String gender, Long major, MultipartFile profileImage, Long shiftId, Long locationId) {
         Optional<User> optionalUser = userRepository.findById(userId);
         if (optionalUser.isEmpty()) {
             return ResponseUtil.error("User not found!");
@@ -96,12 +108,25 @@ public class StudentService {
             }
         }
 
+        Optional<Location> locationOp = locationRepository.findById(locationId);
+        if (locationOp.isEmpty()) {
+            return ResponseUtil.error("Location not found!");
+        }
+        Location location = locationOp.get();
+
+        Optional<Shift> optionalShift = shiftRepository.findById(shiftId);
+        if (optionalShift.isEmpty()) {
+            return ResponseUtil.error("Shift not found!");
+        }
+        Shift shift = optionalShift.get();
+
         user.setFirstname(firstName);
         user.setLastname(lastName);
         user.setEmail(email);
         user.setPhone(phone);
         user.setGender(gender);
-
+        student.setShift(shift);
+        student.setLocation(location);
         student.setMajor(majorObj);
 
         studentRepository.save(student);

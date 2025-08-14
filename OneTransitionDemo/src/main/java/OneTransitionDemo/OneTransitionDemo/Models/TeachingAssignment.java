@@ -29,5 +29,9 @@ public class TeachingAssignment {
     public void setTeacher(User teacher) {
         this.teacher = teacher;
     }
+
+    public Long getId() {
+        return id;
+    }
 }
 

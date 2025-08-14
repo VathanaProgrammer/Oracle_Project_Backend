@@ -11,10 +11,12 @@ public class AssignedToDTO {
     private Long shiftId;
     private Long subjectId;
     private Long locationId;
+    private String location;
+    private String buildingName;
+    private String floorNumber;
     private Long majorId;
     private Long academicYearId;
     private String year;
-    private String location;
     private String shiftName;
     private String shiftTime;
     private String major;
@@ -28,13 +30,15 @@ public class AssignedToDTO {
 
         this.shiftId = assignedTo.getShift().getId();
         this.shiftName = assignedTo.getShift().getName() != null ? assignedTo.getShift().getName() : null;
-        this.shiftTime = assignedTo.getShift().getStartTime() + " - " + assignedTo.getShift().getEndTime();
+        this.shiftTime = assignedTo.getShift().getStartTime() + "-" + assignedTo.getShift().getEndTime();
 
+        this.buildingName = assignedTo.getLocation().getBuildingName();
+        this.floorNumber = assignedTo.getLocation().getFloorNumber();
         this.locationId = assignedTo.getLocation().getId();
         this.location = assignedTo.getLocation().getRomeName();
 
         this.batchId = assignedTo.getBatch().getId();
-        this.batch = assignedTo.getBatch().getStartYear() + " - "+  assignedTo.getBatch().getEndYear();
+        this.batch = assignedTo.getBatch().getStartYear() + "-"+  assignedTo.getBatch().getEndYear();
 
         this.academicYearId = assignedTo.getAcademicYear().getId();
         this.year = assignedTo.getAcademicYear().getName();
@@ -101,5 +105,48 @@ public class AssignedToDTO {
 
     public String getSubjectName() {
         return subjectName;
+    }
+    public void setSubjectName(String subjectName) {
+        this.subjectName = subjectName;
+    }
+
+    public Long getSemesterNumber() {
+        return semesterNumber;
+    }
+
+    public Long getLocationId() {
+        return locationId;
+    }
+
+    public String getBuildingName() {
+        return buildingName;
+    }
+
+    public String getFloorNumber() {
+        return floorNumber;
+    }
+
+    public Long getMajorId() {
+        return majorId;
+    }
+
+    public Long getShiftId() {
+        return shiftId;
+    }
+
+    public Long getSubjectId() {
+        return subjectId;
+    }
+
+    public Long getBatchId() {
+        return batchId;
+    }
+
+    public Long getSemesterId() {
+        return semesterId;
+    }
+
+    public Long getAcademicYearId() {
+        return academicYearId;
     }
 }

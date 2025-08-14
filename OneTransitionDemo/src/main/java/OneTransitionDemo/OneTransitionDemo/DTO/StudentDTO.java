@@ -18,6 +18,13 @@ public class StudentDTO {
     private String major;     // Assuming Major has getName()
     private String classGroup; // Assuming ClassGroup has getName()
     private String batch;
+    private Long semester;
+    private Long shiftId;
+    private String shiftName;
+    private String shiftTime;
+    private Long locationId;
+    private String location;
+
     public StudentDTO() {
     }// Assuming Batch has getName()
     public StudentDTO(Student student) {
@@ -28,11 +35,17 @@ public class StudentDTO {
         this.lastname = student.getUser().getLastname();
         this.gender = student.getUser().getGender(); // if in Student, else student.getUser().getGender()
         this.role = student.getUser().getRole().name();
-        this.batch = student.getBatch() != null ? student.getBatch().toString() : null;
+        this.batch = student.getBatch().getStartYear() + " - " + student.getBatch().getEndYear();
         this.year = student.getYear();
         this.major = student.getMajor().getName() != null ? student.getMajor().getName() : null;
         this.email = student.getUser().getEmail();
         this.phone = student.getUser().getPhone();
+        this.semester = student.getSemester().getNumber();
+        this.shiftId = student.getShift().getId();
+        this.shiftName = student.getShift().getName();
+        this.shiftTime = student.getShift().getStartTime() + " - " + student.getShift().getEndTime();
+        this.locationId = student.getLocation().getId();
+        this.location = student.getLocation().getRomeName();
         this.profilePicture = student.getUser().getProfilePicture();
     }
 
@@ -155,5 +168,29 @@ public class StudentDTO {
 
     public void setBatch(String batch) {
         this.batch = batch;
+    }
+
+    public Long getSemester() {
+        return semester;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public String getShiftName() {
+        return shiftName;
+    }
+
+    public String getShiftTime() {
+        return shiftTime;
+    }
+
+    public Long getShiftId() {
+        return shiftId;
+    }
+
+    public Long getLocationId() {
+        return locationId;
     }
 }

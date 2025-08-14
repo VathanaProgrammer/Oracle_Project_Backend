@@ -5,10 +5,7 @@ import OneTransitionDemo.OneTransitionDemo.Models.User;
 import OneTransitionDemo.OneTransitionDemo.Repositories.UserRepository;
 import OneTransitionDemo.OneTransitionDemo.Request.AdminDepartmentRequest;
 import OneTransitionDemo.OneTransitionDemo.Request.AdminMajorRequest;
-import OneTransitionDemo.OneTransitionDemo.Services.AdminDepartmentService;
-import OneTransitionDemo.OneTransitionDemo.Services.AdminMajorService;
-import OneTransitionDemo.OneTransitionDemo.Services.TeacherService;
-import OneTransitionDemo.OneTransitionDemo.Services.UserService;
+import OneTransitionDemo.OneTransitionDemo.Services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -33,6 +30,9 @@ public class AdminController {
     private AdminDepartmentService adminDepartmentService;
     @Autowired
     private AdminMajorService adminMajorService;
+
+    @Autowired
+    private AdminTeacherService adminTeacherService;
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getAdminInfo(@AuthenticationPrincipal User user,@PathVariable Long id){
@@ -97,6 +97,13 @@ public class AdminController {
     @DeleteMapping("/deleteMajor/{id}")
     public ResponseEntity<?> deleteMajor(@AuthenticationPrincipal User user, @PathVariable Long id){
         Map<String, Object> response = adminMajorService.deleteMajor(id);
+        return ResponseEntity.status((Boolean) response.get("success") ? 200 : 400).body(response);
+    }
+
+    // Teacher's block
+    @GetMapping("/teacher/all")
+    public ResponseEntity<?> getAllTeacher(@AuthenticationPrincipal User user){
+        Map<String, Object>  response = adminTeacherService.getAllTeachers();
         return ResponseEntity.status((Boolean) response.get("success") ? 200 : 400).body(response);
     }
 }

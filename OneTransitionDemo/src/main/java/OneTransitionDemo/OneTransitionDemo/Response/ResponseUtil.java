@@ -24,4 +24,17 @@ public class ResponseUtil {
         res.put("message", message);
         return res;
     }
+
+    // New generic versions using ApiResponse
+    public static <T> ApiResponse<T> successResponse(String message, T data) {
+        return ApiResponse.success(message, data);
+    }
+
+    public static ApiResponse<Void> successResponse(String message) {
+        return ApiResponse.success(message);
+    }
+
+    public static ApiResponse<Void> errorResponse(String message) {
+        return ApiResponse.error(message);
+    }
 }

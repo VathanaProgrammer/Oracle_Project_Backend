@@ -96,7 +96,7 @@ public class UserController {
             @RequestParam("password") String password,
             @RequestParam(value = "profilePicture", required = false) MultipartFile profilePicture,
             @RequestParam(value = "departments", required = false) List<Long> departments,
-            @RequestParam(value = "major", required = false) Long major,
+            @RequestParam(value = "majorId", required = false) Long major,
             @RequestParam(value = "year", required = false) Long year,
             @RequestParam(value = "batch", required = false) Long batch,
             @RequestParam(value = "semester", required = false) Long semester,
@@ -112,6 +112,12 @@ public class UserController {
         System.out.println("email = " + email);
         System.out.println("password = " + password);
         System.out.println("profileImage = " + (profilePicture != null ? profilePicture.getOriginalFilename() : "null"));
+        System.out.println("major = " + major);
+        System.out.println("year = " + year);
+        System.out.println("batch = " + batch);
+        System.out.println("semester = " + semester);
+        System.out.println("shift = " + shift);
+        System.out.println("location = " + location);
         System.out.println("departments = " + departments);
 
         Map<String, Object> response = userService.registerUser(

@@ -39,10 +39,13 @@ public class StudentController {
             @RequestParam("phone") String phone,
             @RequestParam("gender") String gender,
             @RequestParam("majorId") Long majorId,
+            @RequestParam("shiftId") Long shiftId,
+            @RequestParam("locationId") Long locationId,
             @RequestParam(value = "profilePicture", required = false) MultipartFile profilePicture
     ) {
+        System.out.println("Location ID: " + locationId);
         Map<String, Object> response = studentService.updateForAdmin(
-                userId, firstName, lastName, email, phone, gender, majorId, profilePicture
+                userId, firstName, lastName, email, phone, gender, majorId, profilePicture, shiftId, locationId
         );
         return ResponseEntity.status((Boolean) response.get("success") ? 200 : 400).body(response);
     }
