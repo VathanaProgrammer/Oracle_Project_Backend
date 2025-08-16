@@ -1,11 +1,13 @@
 package OneTransitionDemo.OneTransitionDemo.Models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 import java.util.List;
 
 @Entity
 @Table(name = "TBL_SUBJECTS")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Subject {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

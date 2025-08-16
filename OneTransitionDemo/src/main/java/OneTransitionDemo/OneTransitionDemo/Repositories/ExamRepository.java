@@ -30,4 +30,6 @@ public interface ExamRepository extends JpaRepository<Exam, Long> {
 """)
     Optional<Exam> findExamWithQuestionsForAdmin(@Param("id") Long id);
 
+
+
 }

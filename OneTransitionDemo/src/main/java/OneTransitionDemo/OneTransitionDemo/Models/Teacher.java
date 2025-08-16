@@ -22,7 +22,7 @@ public class Teacher {
     @OneToMany(mappedBy = "teacher")
     private List<Exam> examsCreated;
 
-    @ManyToMany(mappedBy = "teachers")
+    @ManyToMany(mappedBy = "teachers",  fetch = FetchType.EAGER)
     @JsonBackReference
     private Set<Department> departments = new HashSet<>();
 

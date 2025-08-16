@@ -2,10 +2,12 @@ package OneTransitionDemo.OneTransitionDemo.Models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 @Entity
 @Table( name = "TBL_MAJORS")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Major {
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
@@ -14,7 +16,7 @@ public class Major {
 
     public Major(){}
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @ManyToOne(fetch = FetchType.EAGER, optional = true)
     @JsonBackReference
     @JoinColumn(name = "department_id", nullable = true)
     private Department department;

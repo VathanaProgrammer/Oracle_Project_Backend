@@ -175,11 +175,11 @@ public class UserController {
             userSessionLogRepository.save(sessionLog);
 
 
-            UserAction recentAction = userActionService.recordAction(
+            Map<String, Object> recentAction = userActionService.recordAction(
                     user.getId(),
                     "login",
                     "Login",
-                    user.getFirstname() +" "+  user.getLastname() + " just logined", user.getFirstname(), user.getLastname()
+                    user.getFirstname() +" "+  user.getLastname() + " just logined", user.getFirstname(), user.getLastname(), user.getProfilePicture(), user.getRole()
             );
 
             messagingTemplate.convertAndSend("/topic/api/actions/recent", recentAction);
@@ -385,5 +385,16 @@ public class UserController {
         Long adminId = admin.getId();
         Map<String, Object> response = userService.changePasswordForAdmin(request.getUserId(), adminId, request.getNewPassword());
         return ResponseEntity.status((Boolean) response.get("success") ? 200 : 400).body(response);
+    }
+
+    @PutMapping("/update-password")
+    public ResponseEntity<?> updatePassword(@AuthenticationPrincipal User user, @RequestParam String email,
+                                            @RequestParam String oldPassword,
+                                            @RequestParam String newPassword) {
+        System.out.println(email);
+        System.out.println(oldPassword);
+        System.out.println(newPassword);
+        Map<String, Object> res =  userService.updatePassword(email,oldPassword, newPassword);
+        return ResponseEntity.status((Boolean) res.get("success") ? 200 : 400).body(res);
     }
 }

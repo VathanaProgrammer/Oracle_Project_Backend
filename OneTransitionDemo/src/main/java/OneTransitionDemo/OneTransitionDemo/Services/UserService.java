@@ -20,7 +20,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -57,6 +58,9 @@ public class UserService implements UserDetailsService {
     private ShiftRepository shiftRepository;
     @Autowired
     private LocationRepository locationRepository;
+
+    @Autowired
+    private JavaMailSender mailSender;
 
     public UserService(UserRepository userRepo, TeacherRepository teacherRepo, StudentRepository studentRepo, PasswordEncoder passwordEncoder, UserActionService userActionService) {
         this.userRepo = userRepo;
@@ -342,7 +346,7 @@ public class UserService implements UserDetailsService {
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepo.save(user);
 
-        userActionService.recordAction(user.getId(), "password_change", "Admin changed password for user", "Admin changed password for user", user.getFirstname(), user.getLastname());
+        userActionService.recordAction(user.getId(), "password_change", "Admin changed password for user", "Admin changed password for user", user.getFirstname(), user.getLastname(), user.getProfilePicture(),user.getRole());
         return ResponseUtil.success("Password changed successfully!");
     }
 
@@ -359,5 +363,22 @@ public class UserService implements UserDetailsService {
         AdminDTO dto = new AdminDTO(opAdmin.get());
         return ResponseUtil.success("User found!", dto);
     }
+    @Autowired
+    private UserRepository userRepository;
+    @Transactional
+    public  Map<String, Object> updatePassword(String email, String oldPassword, String newPassword) {
+       Optional <User> optionalUser = userRepository.findByEmail(email);
+        if(optionalUser.isEmpty()){
+            return ResponseUtil.error("User not found!");
+        }
+        User user = optionalUser.get();
 
+         if(!passwordEncoder.matches(oldPassword, user.getPassword())){
+             return ResponseUtil.error("Incorrect Current password!");
+         }
+        // Encode the new password
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+        return ResponseUtil.success("Your password was changed!");
+    }
 }

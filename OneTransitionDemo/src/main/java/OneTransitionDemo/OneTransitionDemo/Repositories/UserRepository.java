@@ -19,7 +19,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     User findByUsername(@Param("username") String username);
 
     Optional<User> findByEmail(String email);
-
     boolean existsByEmail(String email);
 
 
@@ -37,5 +36,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     long countByRole(Role role);
 
     List<User> findTop4ByRoleOrderByIdDesc(Role role);
-
+    Optional<User> findById(Long id);
 }

@@ -51,16 +51,16 @@ public class ExamController {
             if ("file_exam".equalsIgnoreCase(question.getType())) {
                 for (ExamFileDTO fileExam : question.getFileExams()) { // Convert each exam file object into ExamFileDTO
                     if (files != null && fileIndex < files.size()) { // Client sent this:
-                                                                    // questions: [
-                                                                      //            { type: "file_exam", fileExams: [ {}, {} ] }, // 2 files
-                                                                       //           { type: "file_exam", fileExams: [ {} ] }       // 1 file
-                                                                       //           ]
+                        // questions: [
+                        //            { type: "file_exam", fileExams: [ {}, {} ] }, // 2 files
+                        //           { type: "file_exam", fileExams: [ {} ] }       // 1 file
+                        //           ]
                         MultipartFile file = files.get(fileIndex);     // file object:  files = [ file1.pdf, file2.pdf, file3.pdf ];
-                                                                        //| Loop | `fileIndex` | File used   | File assigned to        |
-                                                                        //| ---- | ----------- | ----------- | ----------------------- |
-                                                                        //| 1    | 0           | `file1.pdf` | question 0 → fileExam 0 |
-                                                                        //| 2    | 1           | `file2.pdf` | question 0 → fileExam 1 |
-                                                                        //| 3    | 2           | `file3.pdf` | question 1 → fileExam 0 |
+                        //| Loop | `fileIndex` | File used   | File assigned to        |
+                        //| ---- | ----------- | ----------- | ----------------------- |
+                        //| 1    | 0           | `file1.pdf` | question 0 → fileExam 0 |
+                        //| 2    | 1           | `file2.pdf` | question 0 → fileExam 1 |
+                        //| 3    | 2           | `file3.pdf` | question 1 → fileExam 0 |
                         //  This line saves the file to the upload/files folder, not database
                         String fileUrl = examFileService.saveFile(file);
 
@@ -161,17 +161,21 @@ public class ExamController {
         return examService.getAllExam();
     }
 
+    @GetMapping("/recover")
+    public List<ExamSummaryDTO> getRecover(@AuthenticationPrincipal User user){return examService.getInactive();}
+
+    @GetMapping("/coming")
+    public List<ExamSummaryDTO> getComing(@AuthenticationPrincipal User user){return examService.getComingExam();}
+
     @GetMapping("/test")
     public List<ExamSummaryDTO> paddingExams() {
         List<ExamSummaryDTO> examSummaryDTO = examService.Exams();
         return examSummaryDTO;
     }
-    @PutMapping("/canceled/{id}")
+    @PutMapping("/deleted/{id}")
     public ResponseEntity<?> cancelExam(@AuthenticationPrincipal User user,@PathVariable Long id){
         Map<String, Object> response = examService.cancelExam(id);
         return  ResponseEntity.status((Boolean)response.get("success") ? 200:400).body(response);
     }
-
-
 
 }

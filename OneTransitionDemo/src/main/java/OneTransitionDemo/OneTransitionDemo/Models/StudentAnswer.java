@@ -17,7 +17,9 @@ public class StudentAnswer {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "student_id", nullable = false)
     private Student student;
-
+    @ManyToOne
+    @JoinColumn(name = "exam_id")
+    private Exam exam;
     // Many answers belong to one question
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "question_id", nullable = false)
@@ -28,7 +30,6 @@ public class StudentAnswer {
     private Boolean answerTrueFalse;
     private String answerFilePath;
     private LocalDateTime submitAt;
-
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }

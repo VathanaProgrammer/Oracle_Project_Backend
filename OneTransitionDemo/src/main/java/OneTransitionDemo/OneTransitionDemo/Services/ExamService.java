@@ -10,7 +10,6 @@ import OneTransitionDemo.OneTransitionDemo.Models.*;
 import OneTransitionDemo.OneTransitionDemo.Repositories.*;
 import OneTransitionDemo.OneTransitionDemo.Response.ResponseUtil;
 import org.springframework.transaction.annotation.Transactional;
-import jakarta.persistence.ManyToMany;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -42,6 +41,7 @@ public class ExamService {
     private TeacherRepository teacherRepository;
 
     // Helper to avoid repeating ourselves for both new and update
+    @Transactional
     private void mapDTOToExam(Exam exam, ExamDTO dto) {
         exam.setTitle(dto.getTitle());
         exam.setDescription(dto.getDescription());
@@ -179,10 +179,30 @@ public class ExamService {
 
         return ResponseUtil.success("Exam was successfully ended.");
     }
-
+    @Transactional
     public List<ExamSummaryDTO> getAllExam(){
         return examRepository.findAll()
                 .stream()
+                .filter(e -> e.getStatus() != Status.DELETED && e.getStatus() != Status.ENDED)
+                .sorted((e1, e2) -> e2.getStartTime().compareTo(e1.getStartTime()))
+                .map(ExamSummaryDTO::new)
+                .toList();
+    }
+
+    @Transactional
+    public List<ExamSummaryDTO> getInactive(){
+        return examRepository.findAll()
+                .stream()
+                .filter(e -> e.getStatus() == Status.DELETED)
+                .sorted((e1, e2) -> e2.getStartTime().compareTo(e1.getStartTime()))
+                .map(ExamSummaryDTO::new)
+                .toList();
+    }
+    public List<ExamSummaryDTO> getComingExam(){
+        return examRepository.findAll()
+                .stream()
+                .filter(e -> e.getStatus() == Status.COMING)
+                .sorted((e1, e2 ) -> e2.getStartTime().compareTo(e1.getStartTime()))
                 .map(ExamSummaryDTO::new)
                 .toList();
     }
@@ -202,7 +222,7 @@ public class ExamService {
         }
 
         Exam exam = optionalExam.get();
-        exam.setStatus(Status.CANCELED);
+        exam.setStatus(Status.DELETED);
 
         // ✅ Force Hibernate to persist
         examRepository.save(exam);

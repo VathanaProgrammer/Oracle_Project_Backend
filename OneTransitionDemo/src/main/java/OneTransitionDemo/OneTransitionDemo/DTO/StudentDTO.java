@@ -24,6 +24,7 @@ public class StudentDTO {
     private String shiftTime;
     private Long locationId;
     private String location;
+    private String department;
 
     public StudentDTO() {
     }// Assuming Batch has getName()
@@ -47,6 +48,7 @@ public class StudentDTO {
         this.locationId = student.getLocation().getId();
         this.location = student.getLocation().getRomeName();
         this.profilePicture = student.getUser().getProfilePicture();
+        this.department = student.getMajor().getDepartment().getName();
     }
 
 
@@ -193,4 +195,8 @@ public class StudentDTO {
     public Long getLocationId() {
         return locationId;
     }
+    public String getDepartment(){
+        return department;
+    }
+
 }

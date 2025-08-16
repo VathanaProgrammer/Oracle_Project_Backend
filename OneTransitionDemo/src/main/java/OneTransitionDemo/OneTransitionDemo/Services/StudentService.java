@@ -135,5 +135,46 @@ public class StudentService {
 
         return ResponseUtil.success("User information updated successfully!");
     }
+    public Map<String, Object> updatePhoneAndProfile(Long userId, String phone, MultipartFile profileImage) throws IOException {
+        if (userId == null) {
+            return ResponseUtil.error("Student not found!");
+        }
+
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (!userOptional.isPresent()) {
+            return ResponseUtil.error("Student not found in database!");
+        }
+
+        User user = userOptional.get();
+
+        // Update phone if provided
+        if (phone != null && !phone.isEmpty()) {
+            System.out.println("Updating phone to: " + phone);
+            user.setPhone(phone);
+        }
+
+        // Handle profile image
+        if (profileImage != null && !profileImage.isEmpty()) {
+            String filename = UUID.randomUUID() + "_" + profileImage.getOriginalFilename();
+            Path uploadDir = Paths.get(uploadPath);
+
+            if (!Files.exists(uploadDir)) {
+                System.out.println("Creating upload directory at: " + uploadDir.toAbsolutePath());
+                Files.createDirectories(uploadDir);
+            }
+
+            Path imagePath = uploadDir.resolve(filename);
+            System.out.println("Saving profile image to: " + imagePath.toAbsolutePath());
+
+            Files.copy(profileImage.getInputStream(), imagePath, StandardCopyOption.REPLACE_EXISTING);
+            user.setProfilePicture(filename);
+        }
+
+        userRepository.save(user);
+        System.out.println("User updated successfully: " + user.getId());
+
+        return ResponseUtil.success("Profile updated successfully");
+    }
+
 
 }
