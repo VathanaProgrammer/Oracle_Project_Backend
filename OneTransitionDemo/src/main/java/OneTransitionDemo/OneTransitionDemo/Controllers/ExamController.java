@@ -149,7 +149,7 @@ public class ExamController {
                 user.getLastname(),
                 "Ended_exam",
                 "Ended exam",
-                user.getFirstname() + " "+ user.getLastname() + " just end an exam");
+                user.getFirstname() + " "+ user.getLastname() + " just end an exam", user.getProfilePicture(), user.getRole());
 
         Map<String, Object> response = examService.endExam(dto,id);
         messagingTemplate.convertAndSend("/topic/api/actions/recent", dto);

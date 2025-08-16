@@ -48,6 +48,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/user/register","/api/user/login","/api/uploads/profile/**", "/upload/**").permitAll()
+                        .requestMatchers("/api/reports/**").permitAll() // <-- add this
                         .requestMatchers("/me", "/api/user/**","/api/user/logout" , "/chat/**","/api/exams/**", "/api/messages/**").authenticated()
                         .requestMatchers("/api/actions/**", "/api/assignments/**", "/api/students/**", "/api/teachers/**", "/api/admins/**").authenticated()
                         .requestMatchers("/api/beforeDetail/**", "/api/session-logs/**").authenticated()
@@ -66,7 +67,7 @@ public class WebConfig implements WebMvcConfigurer {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:3000") // adjust to your frontend origin
+                        .allowedOrigins("http://localhost:5173") // adjust to your frontend origin
                         .allowedMethods("*")
                         .allowCredentials(true); // ✅ allow cookies
             }

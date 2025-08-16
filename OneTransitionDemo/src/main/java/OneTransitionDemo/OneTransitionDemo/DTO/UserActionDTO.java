@@ -1,5 +1,7 @@
 package OneTransitionDemo.OneTransitionDemo.DTO;
 
+import OneTransitionDemo.OneTransitionDemo.ENUMS.Role;
+
 import java.time.LocalDateTime;
 
 public class UserActionDTO {
@@ -8,6 +10,8 @@ public class UserActionDTO {
 
     private String firstName;
     private String lastName;
+    private Role role;
+    private String profilePicture;
 
     private String type;         // EXAM_SUBMITTED, POST_CREATED, etc.
     private String targetType;   // "Exam", "Message", etc.
@@ -23,13 +27,15 @@ public class UserActionDTO {
 
     public UserActionDTO(Long userId, String firstName, String lastName,
                          String type,
-                         String label, String description) {
+                         String label, String description, String profilePicture, Role role) {
         this.userId = userId;
         this.firstName = firstName;
         this.lastName = lastName;
         this.type = type;
         this.label = label;
         this.description = description;
+        this.role = role;
+        this.profilePicture = profilePicture;
     }
 
     // Getters and Setters
@@ -76,4 +82,21 @@ public class UserActionDTO {
     public Long getId() {
         return id;
     }
+    public String getProfilePicture() {
+        return profilePicture;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setProfilePicture(String profilePicture) {
+        this.profilePicture = profilePicture;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+
 }

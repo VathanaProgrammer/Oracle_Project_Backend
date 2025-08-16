@@ -32,6 +32,12 @@ public class UserActionController {
                 .findTop10ByOrderByTimestampDesc(); // latest 10
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<?> getAllActionsForUser(@AuthenticationPrincipal User user){
+        Map<String, Object> response = userActionService.getAllUserAction();
+        return ResponseEntity.status((Boolean) response.get("success") ? 200 : 400).body(response);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<?> getRecentActionsForUser(@AuthenticationPrincipal User user, @PathVariable Long id){
 

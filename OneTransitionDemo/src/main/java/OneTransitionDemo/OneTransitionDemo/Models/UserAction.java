@@ -1,5 +1,6 @@
 package OneTransitionDemo.OneTransitionDemo.Models;
 
+import OneTransitionDemo.OneTransitionDemo.ENUMS.Role;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -18,6 +19,8 @@ public class UserAction {
 
     private String lastName;
 
+    private Role role;
+
     private String type; // e.g., "EXAM_SUBMITTED", "POST_CREATED", "PROFILE_UPDATED"
 
     private String targetType; // e.g., "Exam", "Message", "Profile"
@@ -25,7 +28,7 @@ public class UserAction {
 
     private String label;      // short title to show in UI
     private String description; // more details about the action
-
+    private String profilePicture;
     private LocalDateTime timestamp;
 
     public void setUserId(Long userId) {
@@ -105,6 +108,22 @@ public class UserAction {
 
     public Long getUserId() {
         return userId;
+    }
+
+    public String getProfilePicture() {
+        return profilePicture;
+    }
+
+    public void setProfilePicture(String profilePicture) {
+        this.profilePicture = profilePicture;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    public Role getRole() {
+        return role;
     }
 
     // Getters and Setters

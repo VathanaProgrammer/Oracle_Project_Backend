@@ -24,6 +24,8 @@ public interface UserSessionLogRepository extends JpaRepository<UserSessionLog, 
     @Query("SELECT u FROM UserSessionLog u WHERE u.user.id = :userId")
     List<UserSessionLog> findAllByUserId(@Param("userId") Long userId);
 
+    // Get the latest session log for a user
+    Optional<UserSessionLog> findTopByUser_IdOrderByStartTimeDesc(Long userId);
 
 }
 
