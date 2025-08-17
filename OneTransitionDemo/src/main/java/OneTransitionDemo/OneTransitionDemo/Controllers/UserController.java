@@ -397,4 +397,10 @@ public class UserController {
         Map<String, Object> res =  userService.updatePassword(email,oldPassword, newPassword);
         return ResponseEntity.status((Boolean) res.get("success") ? 200 : 400).body(res);
     }
+
+    @GetMapping("/studentInfo")
+        public ResponseEntity<?> getUserRoleStudent(@AuthenticationPrincipal User user){
+        Map<String, Object> users = userService.getAllStudent();
+        return ResponseEntity.ok(users);
+    }
 }

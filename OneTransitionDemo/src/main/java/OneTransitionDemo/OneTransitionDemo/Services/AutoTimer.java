@@ -1,5 +1,4 @@
 package OneTransitionDemo.OneTransitionDemo.Services;
-
 import OneTransitionDemo.OneTransitionDemo.ENUMS.Status;
 import OneTransitionDemo.OneTransitionDemo.Models.Exam;
 import OneTransitionDemo.OneTransitionDemo.Repositories.ExamRepository;
@@ -10,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
 @Service
 public class AutoTimer {
 
@@ -27,20 +25,19 @@ public class AutoTimer {
         List<Exam> exams = examRepository.findAll();
 
         for (Exam exam : exams) {
-            LocalDateTime start = exam.getStartTime();
-            LocalDateTime end = exam.getEndTime();
-
-            // COMING -> PUBLISHED
-            if (now.isAfter(start) && now.isBefore(end) && exam.getStatus() == Status.COMING) {
+            boolean changed = false;
+            if (now.isAfter(exam.getStartTime()) && now.isBefore(exam.getEndTime()) && exam.getStatus() == Status.COMING) {
                 exam.setStatus(Status.PUBLISHED);
+                changed = true;
             }
-
-            // PUBLISHED -> EXPIRED
-            if (now.isAfter(end) && exam.getStatus() != Status.EXPIRED) {
-                exam.setStatus(Status.EXPIRED);
+            if (now.isAfter(exam.getEndTime()) && exam.getStatus() == Status.PUBLISHED) {
+                exam.setStatus(Status.COMPLETED);
+                changed = true;
             }
-
-            examRepository.save(exam);
+            if (changed) {
+                examRepository.save(exam);
+            }
         }
     }
 }
+

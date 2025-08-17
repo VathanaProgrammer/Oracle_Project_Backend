@@ -105,5 +105,4 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/api/upload/profile/**")
                 .addResourceLocations("file:" + updatedProfilePath + "/");
     }
-
 }

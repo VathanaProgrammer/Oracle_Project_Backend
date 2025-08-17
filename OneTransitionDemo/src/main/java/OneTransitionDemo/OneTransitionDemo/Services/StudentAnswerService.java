@@ -1,17 +1,18 @@
 package OneTransitionDemo.OneTransitionDemo.Services;
 
+import OneTransitionDemo.OneTransitionDemo.DTO.CompleteExamDTO;
 import OneTransitionDemo.OneTransitionDemo.DTO.StudentAnswerDTO;
-import OneTransitionDemo.OneTransitionDemo.Models.Question;
-import OneTransitionDemo.OneTransitionDemo.Models.Student;
-import OneTransitionDemo.OneTransitionDemo.Models.StudentAnswer;
-import OneTransitionDemo.OneTransitionDemo.Repositories.QuestionRepository;
-import OneTransitionDemo.OneTransitionDemo.Repositories.StudentAnswerRepository;
-import OneTransitionDemo.OneTransitionDemo.Repositories.StudentRepository;
+import OneTransitionDemo.OneTransitionDemo.Models.*;
+import OneTransitionDemo.OneTransitionDemo.Repositories.*;
+import OneTransitionDemo.OneTransitionDemo.Response.ResponseUtil;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class StudentAnswerService {
@@ -22,6 +23,10 @@ public class StudentAnswerService {
 
     @Autowired
     private StudentAnswerRepository studentAnswerRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private ExamRepository examRepository;
 
     @Transactional
     public void saveStudentAnswer(Long studentId, Long questionId, StudentAnswerDTO dto) {
@@ -70,5 +75,9 @@ public class StudentAnswerService {
         answer.setSubmitAt(LocalDateTime.now());
         // 💾 Step 4: Save to DB
         studentAnswerRepository.save(answer);
+    }
+    public Map<String, Object> getAnswerStudent(Long id){
+        Optional<User> userOptional = userRepository.findById(id);
+        List<StudentAnswerDTO>  studentAnswerDTOList = studentAnswerRepository.findDistinctStudentsByExam()
     }
 }

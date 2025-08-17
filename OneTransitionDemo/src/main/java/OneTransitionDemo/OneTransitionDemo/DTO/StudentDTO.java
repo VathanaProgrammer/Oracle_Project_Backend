@@ -195,6 +195,7 @@ public class StudentDTO {
     public Long getLocationId() {
         return locationId;
     }
+
     public String getDepartment(){
         return department;
     }

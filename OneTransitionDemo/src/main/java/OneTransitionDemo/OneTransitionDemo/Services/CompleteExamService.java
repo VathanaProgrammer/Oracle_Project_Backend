@@ -1,5 +1,6 @@
 package OneTransitionDemo.OneTransitionDemo.Services;
 
+import OneTransitionDemo.OneTransitionDemo.DTO.CompleteExamDTO;
 import OneTransitionDemo.OneTransitionDemo.Models.CompleteExam;
 import OneTransitionDemo.OneTransitionDemo.Models.Exam;
 import OneTransitionDemo.OneTransitionDemo.Models.Student;
@@ -8,12 +9,14 @@ import OneTransitionDemo.OneTransitionDemo.Repositories.CompleteExamRepository;
 import OneTransitionDemo.OneTransitionDemo.Repositories.ExamRepository;
 import OneTransitionDemo.OneTransitionDemo.Repositories.StudentAnswerRepository;
 import OneTransitionDemo.OneTransitionDemo.Repositories.UserRepository;
+import OneTransitionDemo.OneTransitionDemo.Response.ResponseUtil;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class CompleteExamService {
@@ -32,8 +35,10 @@ public class CompleteExamService {
         this.studentAnswerRepository = studentAnswerRepository;
     }
 
-    public List<CompleteExam> getAllCompletedExams () {
-        return completeExamRepository.findAll();
+    public Map<String, Object> getAllCompletedExams (Long id) {
+        List<CompleteExamDTO> dto= completeExamRepository.findByExamId(id)
+                .stream().map(CompleteExamDTO::new).toList();
+        return ResponseUtil.success("Fuck",dto);
     }
 
     @Transactional

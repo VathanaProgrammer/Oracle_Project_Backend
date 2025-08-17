@@ -8,14 +8,14 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
-
+import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
+@EnableScheduling  // <-- add this
 @EntityScan("OneTransitionDemo.OneTransitionDemo.Models")
 @EnableJpaAuditing
 public class OneTransitionDemoApplication {
-
 	private final ObjectMapper objectMapper;
-	private final AutoTimer autoTimer; // inject your service
+	private final AutoTimer autoTimer;
 
 	public OneTransitionDemoApplication(ObjectMapper objectMapper, AutoTimer autoTimer) {
 		this.objectMapper = objectMapper;
@@ -25,9 +25,7 @@ public class OneTransitionDemoApplication {
 	@PostConstruct
 	public void setup() {
 		objectMapper.registerModule(new JavaTimeModule());
-
-		// Call scheduler manually once at startup
-		autoTimer.updateExamStatuses();
+		autoTimer.updateExamStatuses(); // initial update
 	}
 
 	public static void main(String[] args) {

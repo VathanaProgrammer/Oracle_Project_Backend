@@ -26,6 +26,7 @@ public class ExamSummaryDTO {
     private final Long batchId;
     private final String academicYear;
     private final String major;
+    private final Long teacherId;
     private final String location;
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
@@ -69,6 +70,7 @@ public class ExamSummaryDTO {
 
         this.title = Optional.ofNullable(exam.getTitle()).orElse("");
         this.description = Optional.ofNullable(exam.getDescription()).orElse("");
+        this.teacherId = exam.getTeacher().getUser().getId();
 
         Batch batch = Optional.ofNullable(exam.getAssignedTo()).map(a -> a.getBatch()).orElse(null);
         this.batchName = batch != null ? batch.getBatchName() : "N/A";
@@ -105,4 +107,5 @@ public class ExamSummaryDTO {
     public String getAcademicYear() { return academicYear; }
     public String getMajor() { return major; }
     public String getLocation() { return location; }
+    public Long getTeacherId(){return  teacherId;}
 }

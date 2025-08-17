@@ -1,6 +1,7 @@
 package OneTransitionDemo.OneTransitionDemo.DTO;
 
 import OneTransitionDemo.OneTransitionDemo.Custom.LocalDateTimeCustomDeserializer;
+import OneTransitionDemo.OneTransitionDemo.Models.Exam;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
@@ -8,6 +9,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public class ExamDTO {
+    private Long id;
     private String title;
     private String description;
     private String type;
@@ -27,6 +29,25 @@ public class ExamDTO {
 
     private List<QuestionDTO> questions;
 
+    public ExamDTO(Exam exam){
+        this.id = exam.getId();
+        this.title = exam.getTitle();
+        this.description= exam.getDescription();
+        this.type = String.valueOf(exam.getType());
+        this.createdBy = exam.getTeacher().getUser().getId();
+        this.status = String.valueOf(exam.getStatus());
+        this.startTime = exam.getStartTime();
+        this.endTime = exam.getEndTime();
+        this.duration = exam.getDuration();
+        if (exam.getQuestions() != null) {
+            this.questions = exam.getQuestions().stream()
+                    .map(QuestionDTO::new) // use your existing constructor
+                    .toList();
+        } else {
+            this.questions = List.of(); // fallback empty list
+        }
+        this.assignTo = exam.getAssignedTo().getId();
+    }
     // Getters and Setters
 
     public String getTitle() { return title; }
@@ -72,4 +93,7 @@ public class ExamDTO {
         this.teacherProfilePicture = teacherProfilePicture;
     }
 
+    public Long getId() {
+        return id;
+    }
 }

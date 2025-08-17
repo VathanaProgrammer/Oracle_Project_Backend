@@ -1,5 +1,6 @@
 package OneTransitionDemo.OneTransitionDemo.Repositories;
 
+import OneTransitionDemo.OneTransitionDemo.DTO.CompleteExamDTO;
 import OneTransitionDemo.OneTransitionDemo.Models.Exam;
 import OneTransitionDemo.OneTransitionDemo.Models.Student;
 import OneTransitionDemo.OneTransitionDemo.Models.StudentAnswer;

@@ -1,6 +1,7 @@
 package OneTransitionDemo.OneTransitionDemo.Services;
 
 import OneTransitionDemo.OneTransitionDemo.DTO.AdminDTO;
+import OneTransitionDemo.OneTransitionDemo.DTO.StudentDTO;
 import OneTransitionDemo.OneTransitionDemo.DTO.UserDTO;
 import OneTransitionDemo.OneTransitionDemo.DTO.UserSummaryDTO;
 import OneTransitionDemo.OneTransitionDemo.ENUMS.Role;
@@ -19,6 +20,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -380,5 +382,10 @@ public class UserService implements UserDetailsService {
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
         return ResponseUtil.success("Your password was changed!");
+    }
+
+    public Map<String, Object> getAllStudent() {
+         List<StudentDTO>  studentDTO =  studentRepo.findAll().stream().map(StudentDTO::new).toList();
+         return ResponseUtil.success("Success", studentDTO);
     }
 }

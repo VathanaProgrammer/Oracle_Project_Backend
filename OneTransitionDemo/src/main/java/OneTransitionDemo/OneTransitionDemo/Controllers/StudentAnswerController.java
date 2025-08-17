@@ -1,5 +1,6 @@
 package OneTransitionDemo.OneTransitionDemo.Controllers;
 
+import OneTransitionDemo.OneTransitionDemo.DTO.CompleteExamDTO;
 import OneTransitionDemo.OneTransitionDemo.DTO.StudentAnswerDTO;
 import OneTransitionDemo.OneTransitionDemo.Models.Question;
 import OneTransitionDemo.OneTransitionDemo.Models.Student;
@@ -9,6 +10,7 @@ import OneTransitionDemo.OneTransitionDemo.Repositories.QuestionRepository;
 import OneTransitionDemo.OneTransitionDemo.Repositories.StudentAnswerRepository;
 import OneTransitionDemo.OneTransitionDemo.Repositories.StudentRepository;
 import OneTransitionDemo.OneTransitionDemo.Services.ExamFileService;
+import OneTransitionDemo.OneTransitionDemo.Services.StudentAnswerService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 
@@ -37,6 +39,9 @@ public class StudentAnswerController {
 
     @Autowired
     private QuestionRepository questionRepository;
+
+    @Autowired
+    private StudentAnswerService studentAnswerService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> saveMultipleStudentAnswers(
@@ -109,4 +114,5 @@ public class StudentAnswerController {
             return ResponseEntity.badRequest().body("Error saving answers: " + e.getMessage());
         }
     }
+
 }

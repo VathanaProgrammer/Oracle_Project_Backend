@@ -5,6 +5,7 @@ import OneTransitionDemo.OneTransitionDemo.Models.Exam;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Repository
@@ -18,5 +19,8 @@ public interface CompleteExamRepository extends JpaRepository<CompleteExam, Long
 
     // Optional: find by user and exam (for checking if already completed)
     CompleteExam findByUserAndExam(User user, Exam exam);
+
+    // Corrected method:
+    List<CompleteExam> findByExamId(Long id);
 }
 

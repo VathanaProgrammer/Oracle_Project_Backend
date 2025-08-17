@@ -55,4 +55,7 @@ public class StudentAnswer {
     public LocalDateTime getSubmitAt() { return submitAt; }
     public void setSubmitAt(LocalDateTime submitAt) { this.submitAt = submitAt; }
 
+    public Exam getExam() {
+        return exam;
+    }
 }
