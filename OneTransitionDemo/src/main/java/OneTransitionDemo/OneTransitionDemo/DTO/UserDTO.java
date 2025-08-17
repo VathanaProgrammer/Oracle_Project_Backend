@@ -12,6 +12,8 @@ public class UserDTO {
     private String lastname;
     private String phone;
     private String profilePicture;
+    private String gender;
+
 
     public UserDTO() {
     }
@@ -25,6 +27,7 @@ public class UserDTO {
         this.lastname = user.getLastname();
         this.phone = user.getPhone();
         this.profilePicture = user.getProfilePicture();
+        this.gender = user.getGender();
     }
 
 
@@ -91,5 +94,13 @@ public class UserDTO {
 
     public void setProfilePicture(String profilePicture) {
         this.profilePicture = profilePicture;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 }

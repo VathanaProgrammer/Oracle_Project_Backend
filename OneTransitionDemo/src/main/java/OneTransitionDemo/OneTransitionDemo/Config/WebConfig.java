@@ -38,6 +38,9 @@ public class WebConfig implements WebMvcConfigurer {
     @Value("${upload.path.profile}")
     private String updatedProfilePath;
 
+    @Value("${upload.path.file.file.and.audio}")
+    private String uploadAudioPath;
+
     @Autowired
     private CustomAuthenticationProvider customAuthenticationProvider;
 
@@ -48,11 +51,12 @@ public class WebConfig implements WebMvcConfigurer {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/user/register","/api/user/login","/api/uploads/profile/**", "/upload/**").permitAll()
-                        .requestMatchers("/api/reports/**").permitAll() // <-- add this
+                        .requestMatchers("/api/reports/**", "/api/materials/**").permitAll() // <-- add this
                         .requestMatchers("/me", "/api/user/**","/api/user/logout" , "/chat/**","/api/exams/**", "/api/messages/**").authenticated()
                         .requestMatchers("/api/actions/**", "/api/assignments/**", "/api/students/**", "/api/teachers/**", "/api/admins/**").authenticated()
                         .requestMatchers("/api/beforeDetail/**", "/api/session-logs/**").authenticated()
                         .requestMatchers("/api/answers/**", "/api/semesters/**", "/api/shifts/**", "/api/locations/**" ).authenticated()
+                        .requestMatchers("/api/admin-chat/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(customAuthenticationProvider)
@@ -104,5 +108,13 @@ public class WebConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/api/upload/profile/**")
                 .addResourceLocations("file:" + updatedProfilePath + "/");
+
+        // New global audio mapping
+        registry.addResourceHandler("/audio/**")
+                .addResourceLocations("file:" + uploadAudioPath + "/"); // you can inject this path from properties
+
+        registry.addResourceHandler("/api/files/messages/**")
+                .addResourceLocations("file:" + uploadAudioPath + "/");
     }
+
 }

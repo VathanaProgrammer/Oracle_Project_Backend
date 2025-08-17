@@ -18,14 +18,21 @@ public class ChatMessage {
     private String fileUrl; // where the file is stored (disk or cloud)
     private String fileType; // "mp3", "png", "pdf", etc.
 
+    @Column( nullable = true)
+    private Long receiverId;
     private Long senderId;
     private String senderName;
     private LocalDateTime timestamp;
+    private String senderProfile;
 
     @ElementCollection
     private List<Long> seenBy;
 
     private Long chatId;
+
+
+    public Long getReceiverId() { return receiverId; }
+    public void setReceiverId(Long receiverId) { this.receiverId = receiverId; }
 
     // Getters & Setters
     public Long getId() { return id; }
@@ -74,5 +81,13 @@ public class ChatMessage {
 
     public void setFileUrl(String fileUrl) {
         this.fileUrl = fileUrl;
+    }
+
+    public String getSenderProfile() {
+        return senderProfile;
+    }
+
+    public void setSenderProfile(String senderProfile) {
+        this.senderProfile = senderProfile;
     }
 }

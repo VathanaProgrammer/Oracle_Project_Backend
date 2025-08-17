@@ -34,7 +34,7 @@ public class AssignmentController {
         return ResponseEntity.ok(assignments);
     }
 
-    @GetMapping()
+    @GetMapping
     public List<AssignedToDTO> getAllAssignments() {
         return assignedToService.getAllAssignments();
     }

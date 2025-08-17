@@ -5,7 +5,12 @@ import jakarta.persistence.*;
 @Table(name = "TBL_BATCHES")
 public class Batch {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator(
+            name = "batch_seq",
+            sequenceName = "TBL_BATCHES_SEQ", // must exist in DB
+            allocationSize = 1
+    )
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "batch_seq")
     private Long id;
 
     private int startYear;  // e.g., 2022

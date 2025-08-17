@@ -76,8 +76,8 @@ public class StudentAnswerService {
         // 💾 Step 4: Save to DB
         studentAnswerRepository.save(answer);
     }
-    public Map<String, Object> getAnswerStudent(Long id){
-        Optional<User> userOptional = userRepository.findById(id);
-        List<StudentAnswerDTO>  studentAnswerDTOList = studentAnswerRepository.findDistinctStudentsByExam()
-    }
+//    public Map<String, Object> getAnswerStudent(Long id){
+//        Optional<User> userOptional = userRepository.findById(id);
+//        List<StudentAnswerDTO>  studentAnswerDTOList = studentAnswerRepository.findDistinctStudentsByExam();
+//    }
 }

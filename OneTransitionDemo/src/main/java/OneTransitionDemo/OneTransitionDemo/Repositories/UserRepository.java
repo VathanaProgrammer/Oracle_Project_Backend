@@ -37,4 +37,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     List<User> findTop4ByRoleOrderByIdDesc(Role role);
     Optional<User> findById(Long id);
+
+    // Select users by list of IDs
+    List<User> findByIdIn(List<Long> ids);
+
+    // Select users by role with limit
+    @Query("SELECT u FROM User u WHERE u.role = :role")
+    List<User> findByRole(@Param("role") Role role);
+
+
 }

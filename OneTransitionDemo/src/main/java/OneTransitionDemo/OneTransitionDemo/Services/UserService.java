@@ -8,7 +8,16 @@ import OneTransitionDemo.OneTransitionDemo.ENUMS.Role;
 import OneTransitionDemo.OneTransitionDemo.Models.*;
 import OneTransitionDemo.OneTransitionDemo.Repositories.*;
 import OneTransitionDemo.OneTransitionDemo.Response.ResponseUtil;
+import com.lowagie.text.Document;
+import com.lowagie.text.PageSize;
+import com.lowagie.text.Phrase;
+import com.lowagie.text.pdf.PdfPCell;
+import com.lowagie.text.pdf.PdfPTable;
+import com.lowagie.text.pdf.PdfWriter;
 import jakarta.transaction.Transactional;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -24,6 +33,9 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -32,6 +44,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -387,5 +400,95 @@ public class UserService implements UserDetailsService {
     public Map<String, Object> getAllStudent() {
          List<StudentDTO>  studentDTO =  studentRepo.findAll().stream().map(StudentDTO::new).toList();
          return ResponseUtil.success("Success", studentDTO);
+    }
+
+    public List<User> getUsersForExport(List<Long> ids, String role, Integer limit) {
+        // If specific IDs selected
+        if (ids != null && !ids.isEmpty()) {
+            return userRepository.findByIdIn(ids); // returns List<User>
+        }
+
+        // If role is ALL / null / empty
+        if (role == null || role.isEmpty() || "ALL".equalsIgnoreCase(role) || "All Roles".equalsIgnoreCase(role)) {
+            return userRepository.findAll(PageRequest.of(0, limit)).getContent(); // Page<User> -> List<User>
+        }
+
+        // Convert role string to enum
+        Role roleEnum;
+        try {
+            roleEnum = Role.valueOf(role.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid role: " + role);
+        }
+
+        return userRepository.findByRole(roleEnum, PageRequest.of(0, limit)).getContent();
+    }
+
+
+
+    public ByteArrayInputStream generateExcelReport(List<User> users) throws Exception {
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("Users");
+
+        // Header
+        Row header = sheet.createRow(0);
+        String[] columns = {"ID", "Full Name", "Email", "Role", "Phone"};
+        for (int i = 0; i < columns.length; i++) header.createCell(i).setCellValue(columns[i]);
+
+        // Data
+        int rowIdx = 1;
+        for (User user : users) {
+            Row row = sheet.createRow(rowIdx++);
+            row.createCell(0).setCellValue(user.getId());
+            row.createCell(1).setCellValue(user.getFirstname() + " " + user.getLastname());
+            row.createCell(2).setCellValue(user.getEmail());
+            row.createCell(3).setCellValue(user.getRole().name());
+            row.createCell(4).setCellValue(user.getPhone());
+        }
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        workbook.write(out);
+        workbook.close();
+
+        return new ByteArrayInputStream(out.toByteArray());
+    }
+
+    public ByteArrayInputStream generatePdfReport(List<User> users) throws Exception {
+        Document document = new Document(PageSize.A4);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        PdfWriter.getInstance(document, out);
+        document.open();
+
+        PdfPTable table = new PdfPTable(5);
+        table.setWidthPercentage(100);
+        table.setWidths(new int[]{2, 4, 5, 3, 3});
+
+        // Header
+        Stream.of("ID", "Full Name", "Email", "Role", "Phone")
+                .forEach(headerTitle -> table.addCell(new PdfPCell(new Phrase(headerTitle))));
+
+        // Rows
+        for (User user : users) {
+            table.addCell(String.valueOf(user.getId()));
+            table.addCell(user.getFirstname() + " " + user.getLastname());
+            table.addCell(user.getEmail());
+            table.addCell(user.getRole().name());
+            table.addCell(user.getPhone());
+        }
+
+        document.add(table);
+        document.close();
+
+        return new ByteArrayInputStream(out.toByteArray());
+    }
+
+    public Map<String, Object>  getUserInfo(Long id){
+        Optional<User> userOpt = userRepo.findById(id);
+        if (userOpt.isEmpty()) {
+            return ResponseUtil.error("User not found!");
+        }
+
+        UserDTO dto = new UserDTO(userOpt.get());
+        return ResponseUtil.success("User found!", dto);
     }
 }

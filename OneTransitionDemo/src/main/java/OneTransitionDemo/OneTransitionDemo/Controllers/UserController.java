@@ -403,4 +403,12 @@ public class UserController {
         Map<String, Object> users = userService.getAllStudent();
         return ResponseEntity.ok(users);
     }
+
+    @GetMapping("/info")
+    public ResponseEntity<?> getInfo(@AuthenticationPrincipal User user)
+    {
+        Map<String, Object> response = userService.getUserInfo(user.getId());
+        return ResponseEntity.status((Boolean) response.get("success") ? 200 : 400).body(response);
+    }
+
 }
