@@ -57,4 +57,10 @@ public class CompletedExamController {
         Map<String, Object> res =  completeExamService.getAllCompletedExams(examId);
         return ResponseEntity.status((Boolean) res.get("success") ? 200 : 400).body(res);
     }
+
+    @GetMapping("/{id}/viewAnswer/{userId}")
+    public ResponseEntity<?> getAnswer(@AuthenticationPrincipal User user, @PathVariable Long id, @PathVariable Long userId){
+        Map<String, Object> response = studentAnswerService.getStudentAnswersWithQuestions(userId, id);
+        return ResponseEntity.status((Boolean) response.get("success") ? 200 : 400).body(response);
+    }
 }

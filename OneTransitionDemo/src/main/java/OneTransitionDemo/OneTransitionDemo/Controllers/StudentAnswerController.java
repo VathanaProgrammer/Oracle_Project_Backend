@@ -2,13 +2,8 @@ package OneTransitionDemo.OneTransitionDemo.Controllers;
 
 import OneTransitionDemo.OneTransitionDemo.DTO.CompleteExamDTO;
 import OneTransitionDemo.OneTransitionDemo.DTO.StudentAnswerDTO;
-import OneTransitionDemo.OneTransitionDemo.Models.Question;
-import OneTransitionDemo.OneTransitionDemo.Models.Student;
-import OneTransitionDemo.OneTransitionDemo.Models.StudentAnswer;
-import OneTransitionDemo.OneTransitionDemo.Models.User;
-import OneTransitionDemo.OneTransitionDemo.Repositories.QuestionRepository;
-import OneTransitionDemo.OneTransitionDemo.Repositories.StudentAnswerRepository;
-import OneTransitionDemo.OneTransitionDemo.Repositories.StudentRepository;
+import OneTransitionDemo.OneTransitionDemo.Models.*;
+import OneTransitionDemo.OneTransitionDemo.Repositories.*;
 import OneTransitionDemo.OneTransitionDemo.Services.ExamFileService;
 import OneTransitionDemo.OneTransitionDemo.Services.StudentAnswerService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -42,6 +37,10 @@ public class StudentAnswerController {
 
     @Autowired
     private StudentAnswerService studentAnswerService;
+    @Autowired
+    private ExamRepository examRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> saveMultipleStudentAnswers(
@@ -79,15 +78,29 @@ public class StudentAnswerController {
             List<StudentAnswer> savedAnswers = new ArrayList<>();
 
             for (StudentAnswerDTO dto : answersList) {
-                Long studentId = dto.getStudentDTO().getId();
+                Long studentId = dto.getUserId();
                 Long questionId = dto.getQuestionDTO().getId();
 
-                Question question = questionRepository.findById(questionId)
-                        .orElseThrow(() -> new RuntimeException("Question not found: " + questionId));
-                Student student = studentRepository.findByUserId(studentId)
-                        .orElseThrow(() -> new RuntimeException("Student not found: " + studentId));
+                System.out.println("Student ID: " + studentId);
+
+                Optional <Question> qOp = questionRepository.findById(questionId);
+                if(qOp.isEmpty()) {
+                    return ResponseEntity.badRequest().body("Question not found: " + questionId);
+                }
+                Question question = qOp.get();
+                Optional<User> studentOp = userRepository.findById(studentId);
+                if(studentOp.isEmpty()) {
+                    return ResponseEntity.badRequest().body("Student not found: " + studentId);
+                }
+                User student = studentOp.get();
 
                 StudentAnswer answer = new StudentAnswer();
+                Optional<Exam> examOp = examRepository.findById(dto.getExamId());
+                if(examOp.isEmpty()) {
+                    return ResponseEntity.badRequest().body("Exam not found: " + dto.getExamId());
+                }
+                Exam exam = examOp.get();
+                answer.setExam(exam);
                 answer.setStudent(student);
                 answer.setQuestion(question);
                 answer.setAnswerIndex(dto.getAnswerIndex());

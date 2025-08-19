@@ -29,6 +29,10 @@ public class ExamDTO {
 
     private List<QuestionDTO> questions;
 
+    // ✅ Required by Jackson
+    public ExamDTO() {
+    }
+
     public ExamDTO(Exam exam){
         this.id = exam.getId();
         this.title = exam.getTitle();

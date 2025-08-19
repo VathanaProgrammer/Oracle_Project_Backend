@@ -15,8 +15,8 @@ public class StudentAnswer {
 
     // Many answers belong to one student
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "student_id", nullable = false)
-    private Student student;
+    @JoinColumn(name = "user_id", nullable = false)
+    private User student;
     @ManyToOne
     @JoinColumn(name = "exam_id")
     private Exam exam;
@@ -34,8 +34,8 @@ public class StudentAnswer {
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
-    public Student getStudent() { return student; }
-    public void setStudent(Student student) { this.student = student; }
+    public User getStudent() { return student; }
+    public void setStudent(User student) { this.student = student; }
 
     public Question getQuestion() { return question; }
     public void setQuestion(Question question) { this.question = question; }
@@ -57,5 +57,9 @@ public class StudentAnswer {
 
     public Exam getExam() {
         return exam;
+    }
+
+    public void setExam(Exam exam) {
+        this.exam = exam;
     }
 }

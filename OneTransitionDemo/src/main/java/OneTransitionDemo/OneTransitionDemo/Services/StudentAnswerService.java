@@ -1,6 +1,8 @@
 package OneTransitionDemo.OneTransitionDemo.Services;
 
 import OneTransitionDemo.OneTransitionDemo.DTO.CompleteExamDTO;
+import OneTransitionDemo.OneTransitionDemo.DTO.ExamDTO;
+import OneTransitionDemo.OneTransitionDemo.DTO.QuestionDTO;
 import OneTransitionDemo.OneTransitionDemo.DTO.StudentAnswerDTO;
 import OneTransitionDemo.OneTransitionDemo.Models.*;
 import OneTransitionDemo.OneTransitionDemo.Repositories.*;
@@ -9,10 +11,8 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class StudentAnswerService {
@@ -32,7 +32,7 @@ public class StudentAnswerService {
     public void saveStudentAnswer(Long studentId, Long questionId, StudentAnswerDTO dto) {
 
         // 🔍 Step 1: Validate student and question
-        Student student = studentRepository.findByUserId(studentId)
+        User student = userRepository.findById(studentId)
                 .orElseThrow(() -> new RuntimeException("Student with ID " + studentId + " not found"));
 
         Question question = questionRepository.findById(questionId)
@@ -80,4 +80,72 @@ public class StudentAnswerService {
 //        Optional<User> userOptional = userRepository.findById(id);
 //        List<StudentAnswerDTO>  studentAnswerDTOList = studentAnswerRepository.findDistinctStudentsByExam();
 //    }
+public Map<String, Object> getStudentAnswersWithQuestions(Long userId, Long examId) {
+    List<Question> examQuestions = questionRepository.findByExamsId(examId);
+    List<StudentAnswer> studentAnswers = studentAnswerRepository.findByExamIdAndUserId(examId, userId);
+
+    Exam exam = examRepository.findById(examId)
+            .orElseThrow(() -> new RuntimeException("Exam not found"));
+    User student = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+    ExamDTO examDTO = new ExamDTO(exam);
+    examDTO.setQuestions(Collections.emptyList()); // avoid nested duplication
+
+    Map<Long, StudentAnswer> answerMap = studentAnswers.stream()
+            .collect(Collectors.toMap(sa -> sa.getQuestion().getId(), sa -> sa));
+
+    List<StudentAnswerDTO> answerDTOs = examQuestions.stream().map(question -> {
+        StudentAnswerDTO dto = new StudentAnswerDTO();
+        StudentAnswer matchingAnswer = answerMap.get(question.getId());
+
+        dto.setQuestionDTO(new QuestionDTO(question));
+        dto.setStudentId(student.getId());
+        dto.setName(student.getFirstname() + " " + student.getLastname());
+        dto.setProfile(student.getProfilePicture());
+        dto.setExamId(examId);
+
+        if (matchingAnswer != null) {
+            dto.setAnswerContent(matchingAnswer.getAnswerContent());
+            dto.setAnswerIndex(matchingAnswer.getAnswerIndex());
+            dto.setAnswerFilePath(matchingAnswer.getAnswerFilePath());
+
+            // True/False questions
+            if ("true_false".equalsIgnoreCase(question.getType()) && matchingAnswer.getAnswerTrueFalse() != null) {
+                dto.setAnswerTrueFalse(matchingAnswer.getAnswerTrueFalse());
+            }
+            // Short answer questions
+            else if (question.getCorrectAnswer() != null && matchingAnswer.getAnswerContent() != null) {
+                dto.setAnswerTrueFalse(question.getCorrectAnswer().equalsIgnoreCase(matchingAnswer.getAnswerContent()));
+            }
+            // Multiple choice questions
+            else if (question.getCorrectAnswerIndex() != null && matchingAnswer.getAnswerIndex() != null) {
+                dto.setAnswerTrueFalse(question.getCorrectAnswerIndex().equals(matchingAnswer.getAnswerIndex()));
+            }
+            else {
+                dto.setAnswerTrueFalse(false);
+            }
+        } else {
+            dto.setAnswerTrueFalse(false);
+        }
+
+
+        return dto;
+    }).collect(Collectors.toList());
+
+    Map<String, Object> result = new HashMap<>();
+    result.put("success", true);
+    result.put("message", "Student answers found!");
+    result.put("exam", examDTO);
+    result.put("student", Map.of(
+            "id", student.getId(),
+            "firstName", student.getFirstname(),
+            "lastName", student.getLastname(),
+            "profile", student.getProfilePicture()
+    ));
+    result.put("answers", answerDTOs);
+
+    return result;
+}
+
 }

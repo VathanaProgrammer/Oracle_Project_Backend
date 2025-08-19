@@ -19,7 +19,7 @@ public class AutoTimer {
     }
 
     @Transactional
-    @Scheduled(fixedRate = 60000) // every 1 minute
+    @Scheduled(fixedRate = 5000) // every 1 minute
     public void updateExamStatuses() {
         LocalDateTime now = LocalDateTime.now();
         List<Exam> exams = examRepository.findAll();

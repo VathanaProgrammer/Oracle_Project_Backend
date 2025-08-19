@@ -1,15 +1,12 @@
 package OneTransitionDemo.OneTransitionDemo.Services;
 
 import OneTransitionDemo.OneTransitionDemo.DTO.CompleteExamDTO;
-import OneTransitionDemo.OneTransitionDemo.Models.CompleteExam;
-import OneTransitionDemo.OneTransitionDemo.Models.Exam;
-import OneTransitionDemo.OneTransitionDemo.Models.Student;
-import OneTransitionDemo.OneTransitionDemo.Models.User;
-import OneTransitionDemo.OneTransitionDemo.Repositories.CompleteExamRepository;
-import OneTransitionDemo.OneTransitionDemo.Repositories.ExamRepository;
-import OneTransitionDemo.OneTransitionDemo.Repositories.StudentAnswerRepository;
-import OneTransitionDemo.OneTransitionDemo.Repositories.UserRepository;
+import OneTransitionDemo.OneTransitionDemo.DTO.QuestionDTO;
+import OneTransitionDemo.OneTransitionDemo.DTO.StudentAnswerDTO;
+import OneTransitionDemo.OneTransitionDemo.Models.*;
+import OneTransitionDemo.OneTransitionDemo.Repositories.*;
 import OneTransitionDemo.OneTransitionDemo.Response.ResponseUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,13 +14,18 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class CompleteExamService {
 
     private final CompleteExamRepository completeExamRepository;
     private final ExamRepository examRepository;
-    private final StudentAnswerRepository studentAnswerRepository; // track who submitted
+    private final StudentAnswerRepository studentAnswerRepository;
+
+    @Autowired
+    private QuestionRepository questionRepository;// track who submitted
 
     public CompleteExamService(
             CompleteExamRepository completeExamRepository,
@@ -48,10 +50,9 @@ public class CompleteExamService {
         List<Exam> exams = examRepository.findAll();
 
         for (Exam exam : exams) {
-            // Find students who submitted answers for this exam
-            List<Student> submittedStudents = studentAnswerRepository.findDistinctStudentsByExam(exam);
-            for (Student student : submittedStudents) {
-                User user = student.getUser(); // Assuming Student has a getUser() method
+            // Find users who submitted answers for this exam
+            List<User> submittedUsers = studentAnswerRepository.findDistinctStudentsByExam(exam); // returns User now
+            for (User user : submittedUsers) {
                 // Only insert if not already recorded
                 if (completeExamRepository.findByUserAndExam(user, exam) == null) {
                     CompleteExam completeExam = new CompleteExam(user, exam, now);
@@ -59,5 +60,12 @@ public class CompleteExamService {
                 }
             }
         }
+    }
+
+    public Map<String, Object> getViewAnswerById(Long id){
+    Optional<StudentAnswer> answer = studentAnswerRepository.findById(id);
+    if(answer.isEmpty()) return ResponseUtil.error("answer not found!");
+    StudentAnswerDTO dto = new StudentAnswerDTO(answer.get());
+    return ResponseUtil.success("CompleteExam found", dto);
     }
 }
