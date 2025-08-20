@@ -33,8 +33,17 @@ public class AdminController {
 
     @Autowired
     private AdminTeacherService adminTeacherService;
+    @Autowired
+    private AdminExamService adminExamService;
 
-    @GetMapping("/{id}")
+    @GetMapping("/all-exams")
+    public ResponseEntity<?> getAllExams(@AuthenticationPrincipal User user){
+        System.out.println("fakkkkkkkkkkkkkkkkkkkkkkkkkkkk");
+        Map<String, Object> res = adminExamService.getAllExams();
+        return ResponseEntity.status((Boolean) res.get("success") ? 200 : 400).body(res);
+    }
+
+    @GetMapping("/{id:[0-9]+}")
     public ResponseEntity<?> getAdminInfo(@AuthenticationPrincipal User user,@PathVariable Long id){
         Map<String, Object> response = userService.getAdminById(id);
         return ResponseEntity.status((Boolean) response.get("success") ? 200 : 400).body(response);
@@ -106,4 +115,5 @@ public class AdminController {
         Map<String, Object>  response = adminTeacherService.getAllTeachers();
         return ResponseEntity.status((Boolean) response.get("success") ? 200 : 400).body(response);
     }
+
 }

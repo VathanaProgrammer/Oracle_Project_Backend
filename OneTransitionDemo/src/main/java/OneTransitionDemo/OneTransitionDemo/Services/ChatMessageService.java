@@ -111,5 +111,15 @@ public class ChatMessageService {
         return repository.findByChatIdOrderByTimestampAsc(chatId);
     }
 
+    public void markAsSeen(Long messageId, Long userId) {
+        ChatMessage message = repository.findById(messageId).orElseThrow(() -> new RuntimeException("Message not found"));
+        if (message.getSeenBy() == null) {
+            message.setSeenBy(new ArrayList<>());
+        }
+        if (!message.getSeenBy().contains(userId)) {
+            message.getSeenBy().add(userId);
+            repository.save(message);
+        }
+    }
 
 }
