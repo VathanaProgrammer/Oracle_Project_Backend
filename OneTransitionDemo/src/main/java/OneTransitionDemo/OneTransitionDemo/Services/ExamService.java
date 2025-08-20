@@ -40,6 +40,10 @@ public class ExamService {
     @Autowired
     private TeacherRepository teacherRepository;
 
+    @Autowired
+    private CompleteExamRepository completeExamRepository;
+
+
     // Helper to avoid repeating ourselves for both new and update
     @Transactional
     private void mapDTOToExam(Exam exam, ExamDTO dto) {
@@ -132,6 +136,24 @@ public class ExamService {
                     for (Question q : exam.getQuestions()) {
                         q.getOptions().size();       // forces loading of options
                         q.getExamFiles().size();     // forces loading of examFiles
+                    }
+                    return new ExamDetailsDTO(exam);
+                });
+    }
+
+    public Optional<ExamDetailsDTO> getExamDetailsForStudent(Long examId, Long studentId) {
+        // Check if the student has already taken this exam
+        boolean alreadyTaken = completeExamRepository.existsByExamIdAndUserId(examId, studentId);
+        if (alreadyTaken) {
+            return Optional.empty(); // student already took it
+        }
+
+        // Fetch exam with questions as before
+        return examRepository.findExamWithQuestionsForAdmin(examId)
+                .map(exam -> {
+                    for (Question q : exam.getQuestions()) {
+                        q.getOptions().size();   // force load options
+                        q.getExamFiles().size(); // force load exam files
                     }
                     return new ExamDetailsDTO(exam);
                 });

@@ -1,78 +1,30 @@
 package OneTransitionDemo.OneTransitionDemo.DTO;
 
-import OneTransitionDemo.OneTransitionDemo.Models.AnswerFeedback;
-
 public class AnswerFeedbackDTO {
-       private Long Id;
        private Long score;
        private Long userId;
-       private ExamDTO examDTO;
+       private Long examId;
        private Long questionId;
-       private UserDTO userDTO;
 
-       public AnswerFeedbackDTO(AnswerFeedback answerFeedback) {
-              this.Id = answerFeedback.getId();
-              this.score = answerFeedback.getScore();
+       // Constructors
+       public AnswerFeedbackDTO() {}
 
-              if (answerFeedback.getExam() != null) {
-                     this.examDTO = new ExamDTO(answerFeedback.getExam());
-              }
-
-              if (answerFeedback.getUser() != null) {
-                     this.userDTO = new UserDTO(answerFeedback.getUser());
-              }
-
-              if (answerFeedback.getQuestion() != null) {
-                     this.questionId = answerFeedback.getQuestion().getId();
-              }
-       }
-
-       // Getters
-       public Long getId() {
-              return Id;
-       }
-
-       public Long getScore() {
-              return score;
-       }
-
-       public ExamDTO getExamDTO() {
-              return examDTO;
-       }
-
-       public Long getQuestionId() {
-              return questionId;
-       }
-
-       public UserDTO getUserDTO() {
-              return userDTO;
-       }
-
-       // Setters
-       public void setId(Long id) {
-              this.Id = id;
-       }
-
-       public void setScore(Long score) {
+       public AnswerFeedbackDTO(Long score, Long userId, Long examId, Long questionId) {
               this.score = score;
-       }
-
-       public void setExamDTO(ExamDTO examDTO) {
-              this.examDTO = examDTO;
-       }
-
-       public void setQuestionId(Long questionId) {
+              this.userId = userId;
+              this.examId = examId;
               this.questionId = questionId;
        }
 
-       public void setUserDTO(UserDTO userDTO) {
-              this.userDTO = userDTO;
-       }
-       public Long getUserId(){
-              return userDTO.getId();
-       }
-       public Long getExamId() {
-              return examDTO != null ? examDTO.getId() : null;
-       }
+       // Getters
+       public Long getScore() { return score; }
+       public Long getUserId() { return userId; }
+       public Long getExamId() { return examId; }
+       public Long getQuestionId() { return questionId; }
 
+       // Setters
+       public void setScore(Long score) { this.score = score; }
+       public void setUserId(Long userId) { this.userId = userId; }
+       public void setExamId(Long examId) { this.examId = examId; }
+       public void setQuestionId(Long questionId) { this.questionId = questionId; }
 }

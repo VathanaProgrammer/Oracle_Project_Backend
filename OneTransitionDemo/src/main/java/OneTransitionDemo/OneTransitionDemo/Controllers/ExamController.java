@@ -122,6 +122,19 @@ public class ExamController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/forStudent/{id}")
+    public ResponseEntity<?> getExamDetailsForStudent(@PathVariable Long id, @AuthenticationPrincipal User user) {
+        Optional<ExamDetailsDTO> examOpt = examService.getExamDetailsForStudent(id, user.getId());
+
+        if (examOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("success", false, "message", "You already taken this exam!"));
+        }
+
+        return ResponseEntity.ok(Map.of("success", true, "exam", examOpt.get()));
+    }
+
+
     @GetMapping("/active")
     public List<ExamSummaryDTO> getAvailableExams(@AuthenticationPrincipal User user) {
         List<ExamSummaryDTO> examSummaryDTO= examService.getAvailableExamSummaries();
