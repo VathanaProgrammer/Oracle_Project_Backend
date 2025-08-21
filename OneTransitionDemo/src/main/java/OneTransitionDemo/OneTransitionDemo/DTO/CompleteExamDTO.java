@@ -14,7 +14,9 @@ public class CompleteExamDTO {
     private String phone;
     private Status status;
     private String email;
-    public CompleteExamDTO(CompleteExam completeExam) {
+    private boolean feedbackSubmitted; // 👈 NEW
+
+    public CompleteExamDTO(CompleteExam completeExam, boolean feedbackSubmitted) {
         this.userId = completeExam.getUser().getId();
         this.examId = completeExam.getExam().getId();
         this.firstName = completeExam.getUser().getFirstname();
@@ -22,9 +24,12 @@ public class CompleteExamDTO {
         this.phone = completeExam.getUser().getPhone();
         this.status = completeExam.getExam().getStatus();
         this.profile = completeExam.getUser().getProfilePicture();
-        this.role = completeExam.getUser().getRole();// optional
+        this.role = completeExam.getUser().getRole();
         this.email = completeExam.getUser().getEmail();
+        this.feedbackSubmitted = feedbackSubmitted;
     }
+
+    // getters
     public String getProfile() { return profile; }
     public Long getUserId() { return userId; }
     public Long getExamId() { return examId; }
@@ -33,5 +38,6 @@ public class CompleteExamDTO {
     public Role getRole() { return role; }
     public String getPhone() { return phone; }
     public Status getStatus() { return status; }
-    public String getEmail(){return email;}
+    public String getEmail(){ return email; }
+    public boolean isFeedbackSubmitted() { return feedbackSubmitted; }
 }

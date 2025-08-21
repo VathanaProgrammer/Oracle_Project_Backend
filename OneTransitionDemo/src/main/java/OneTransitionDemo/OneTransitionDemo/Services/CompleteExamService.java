@@ -1,6 +1,7 @@
 package OneTransitionDemo.OneTransitionDemo.Services;
 
 import OneTransitionDemo.OneTransitionDemo.DTO.CompleteExamDTO;
+import OneTransitionDemo.OneTransitionDemo.DTO.ExamGRADED;
 import OneTransitionDemo.OneTransitionDemo.DTO.QuestionDTO;
 import OneTransitionDemo.OneTransitionDemo.DTO.StudentAnswerDTO;
 import OneTransitionDemo.OneTransitionDemo.Models.*;
@@ -25,6 +26,9 @@ public class CompleteExamService {
     private final StudentAnswerRepository studentAnswerRepository;
 
     @Autowired
+    private AnswerFeedbackRepository answerFeedbackRepository;
+
+    @Autowired
     private QuestionRepository questionRepository;// track who submitted
 
     public CompleteExamService(
@@ -37,11 +41,20 @@ public class CompleteExamService {
         this.studentAnswerRepository = studentAnswerRepository;
     }
 
-    public Map<String, Object> getAllCompletedExams (Long id) {
-        List<CompleteExamDTO> dto= completeExamRepository.findByExamId(id)
-                .stream().map(CompleteExamDTO::new).toList();
-        return ResponseUtil.success("Fuck",dto);
+    public Map<String, Object> getAllCompletedExams(Long examId) {
+        List<CompleteExamDTO> dto = completeExamRepository.findByExamId(examId)
+                .stream()
+                .map(ce -> {
+                    boolean feedbackSubmitted = answerFeedbackRepository.existsByExamIdAndUserId(
+                            ce.getExam().getId(), ce.getUser().getId()
+                    );
+                    return new CompleteExamDTO(ce, feedbackSubmitted);
+                })
+                .toList();
+
+        return ResponseUtil.success("Loaded submitted students", dto);
     }
+
 
     @Transactional
     @Scheduled(fixedRate = 60000) // run every 60 seconds

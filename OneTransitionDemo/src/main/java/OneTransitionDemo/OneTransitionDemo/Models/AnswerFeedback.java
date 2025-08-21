@@ -61,6 +61,6 @@ public class AnswerFeedback {
     }
 
     public void setScore(Long score) {
-
+        this.score = score;
     }
 }

@@ -148,4 +148,7 @@ public Map<String, Object> getStudentAnswersWithQuestions(Long userId, Long exam
     return result;
 }
 
+    public List<StudentAnswer> findByUserId(Long studentId) {
+        return studentAnswerRepository.findByStudentId(studentId);
+    }
 }

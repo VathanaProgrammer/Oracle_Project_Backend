@@ -3,6 +3,7 @@ package OneTransitionDemo.OneTransitionDemo.Controllers;
 import OneTransitionDemo.OneTransitionDemo.DTO.*;
 import OneTransitionDemo.OneTransitionDemo.Models.Exam;
 import OneTransitionDemo.OneTransitionDemo.Models.User;
+import OneTransitionDemo.OneTransitionDemo.Services.CompleteExamService;
 import OneTransitionDemo.OneTransitionDemo.Services.ExamFileService;
 import OneTransitionDemo.OneTransitionDemo.Services.ExamService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,6 +36,8 @@ public class ExamController {
 
     @Autowired
     private ExamFileService examFileService;
+    @Autowired
+    private CompleteExamService completeExamService;
 
     @PostMapping
     public ResponseEntity<Exam> saveExam(
@@ -174,6 +177,11 @@ public class ExamController {
         return examService.getAllExam();
     }
 
+    @GetMapping("/take-exam")
+    public List<ExamSummaryDTO> getAllExamForStudentTakeAnExam( @AuthenticationPrincipal User user){
+        return examService.getAvailableExams(user.getId());
+    }
+
     @GetMapping("/recover")
     public List<ExamSummaryDTO> getRecover(@AuthenticationPrincipal User user){return examService.getInactive();}
 
@@ -191,4 +199,8 @@ public class ExamController {
         return  ResponseEntity.status((Boolean)response.get("success") ? 200:400).body(response);
     }
 
+    @GetMapping("/completed/student")
+    public List<ExamGRADED> getCompletedExamForStudent(@AuthenticationPrincipal User user) {
+        return examService.getCompletedExams(user.getId());
+    }
 }

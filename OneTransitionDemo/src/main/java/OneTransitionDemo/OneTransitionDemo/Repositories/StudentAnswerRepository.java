@@ -1,8 +1,6 @@
 package OneTransitionDemo.OneTransitionDemo.Repositories;
 
-import OneTransitionDemo.OneTransitionDemo.DTO.CompleteExamDTO;
 import OneTransitionDemo.OneTransitionDemo.Models.Exam;
-import OneTransitionDemo.OneTransitionDemo.Models.Student;
 import OneTransitionDemo.OneTransitionDemo.Models.StudentAnswer;
 import OneTransitionDemo.OneTransitionDemo.Models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -27,6 +25,7 @@ public interface StudentAnswerRepository extends JpaRepository<StudentAnswer, Lo
     List<StudentAnswer> findByExamIdAndUserId(@Param("examId") Long examId,
                                               @Param("userId") Long userId);
 
+    List<StudentAnswer> findByStudentId(Long studentId);
 }
 
 

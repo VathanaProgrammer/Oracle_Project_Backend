@@ -1,9 +1,6 @@
 package OneTransitionDemo.OneTransitionDemo.Services;
 
-import OneTransitionDemo.OneTransitionDemo.DTO.ExamDTO;
-import OneTransitionDemo.OneTransitionDemo.DTO.ExamDetailsDTO;
-import OneTransitionDemo.OneTransitionDemo.DTO.ExamSummaryDTO;
-import OneTransitionDemo.OneTransitionDemo.DTO.UserActionDTO;
+import OneTransitionDemo.OneTransitionDemo.DTO.*;
 import OneTransitionDemo.OneTransitionDemo.ENUMS.ExamType;
 import OneTransitionDemo.OneTransitionDemo.ENUMS.Status;
 import OneTransitionDemo.OneTransitionDemo.Models.*;
@@ -21,6 +18,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class ExamService {
+
+    @Autowired
+    private AnswerFeedbackRepository answerFeedbackRepository;
 
     @Autowired
     private ExamRepository examRepository;
@@ -42,6 +42,8 @@ public class ExamService {
 
     @Autowired
     private CompleteExamRepository completeExamRepository;
+    @Autowired
+    private StudentRepository studentRepository;
 
 
     // Helper to avoid repeating ourselves for both new and update
@@ -212,6 +214,23 @@ public class ExamService {
     }
 
     @Transactional
+    public List<ExamSummaryDTO> getAvailableExams(Long userId) {
+        // 1. Get the student's profile
+        Student student = studentRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("Student profile not found"));
+
+        // 2. Fetch exams assigned to this student AND not completed
+        List<Exam> exams = examRepository.findAvailableExamsForStudent(student, userId);
+
+        // 3. Filter by status and sort
+        return exams.stream()
+                .filter(e -> e.getStatus() != Status.DELETED && e.getStatus() != Status.ENDED)
+                .sorted((e1, e2) -> e2.getStartTime().compareTo(e1.getStartTime()))
+                .map(ExamSummaryDTO::new)
+                .toList();
+    }
+
+    @Transactional
     public List<ExamSummaryDTO> getInactive(){
         return examRepository.findAll()
                 .stream()
@@ -251,6 +270,36 @@ public class ExamService {
 
         return ResponseUtil.success("Exam canceled");
     }
+
+    @Transactional
+    public List<ExamGRADED> getCompletedExams(Long userId) {
+        // Fetch all exams that are both submitted and graded
+        List<Exam> gradedExams = completeExamRepository.findCompletedAndGradedExams(userId);
+
+        // Map to DTO with total score
+        return gradedExams.stream().map(exam -> {
+            // Calculate total score from AnswerFeedback
+            Long totalScore = answerFeedbackRepository.sumScoreByUserAndExam(userId, exam.getId());
+
+            // Build your DTO
+            return new ExamGRADED(
+                    exam.getId(),
+                    exam.getTitle(),
+                    exam.getAssignedTo().getSubject().getName(),
+                    exam.getStartTime(),
+                    totalScore
+            );
+        }).toList();
+    }
+
+    public Double getAverageScore(Long userId) {
+        return examRepository.findAverageScore(userId);
+    }
+
+    public Long getCompletedExamCount(Long userId) {
+        return examRepository.countCompletedExams(userId);
+    }
+
 
 
 }

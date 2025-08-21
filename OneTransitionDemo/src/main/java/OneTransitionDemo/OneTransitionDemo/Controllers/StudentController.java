@@ -1,8 +1,10 @@
 package OneTransitionDemo.OneTransitionDemo.Controllers;
 
+import OneTransitionDemo.OneTransitionDemo.Models.Exam;
 import OneTransitionDemo.OneTransitionDemo.Models.User;
 import OneTransitionDemo.OneTransitionDemo.Repositories.StudentRepository;
 import OneTransitionDemo.OneTransitionDemo.Request.StudentForAdminRequest;
+import OneTransitionDemo.OneTransitionDemo.Services.ExamService;
 import OneTransitionDemo.OneTransitionDemo.Services.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -21,6 +25,9 @@ public class StudentController {
 
     @Autowired
     private StudentService studentService;
+
+    @Autowired
+    private ExamService examService;
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getStudentInfo(@AuthenticationPrincipal User user,
@@ -64,6 +71,19 @@ public class StudentController {
         }
         Map<String, Object> response = studentService.updatePhoneAndProfile(userId, phone, profilePicture);
         return ResponseEntity.status((Boolean) response.get("success") ? 200 : 400).body(response);
+    }
+
+    @GetMapping("/start")
+    public Map<String, Object> getExamResults(@AuthenticationPrincipal User user) {
+        Long userId = user.getId();
+        Double averageScore = examService.getAverageScore(userId);
+        Long completedCount = examService.getCompletedExamCount(userId);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("averageScore", averageScore);
+        response.put("completedCount", completedCount);
+
+        return response;
     }
 
 

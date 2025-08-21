@@ -31,6 +31,16 @@ public class StudentAnswer {
     private String answerFilePath;
     private LocalDateTime submitAt;
 
+    private Boolean isChecked;
+
+    public Boolean getIsChecked() {
+        return isChecked;
+    }
+
+    public Boolean getChecked() {
+        return isChecked;
+    }
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

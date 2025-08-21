@@ -10,6 +10,7 @@ public class ResultDTO {
     private LocalDateTime submittedAt;
     private Long examId;
     private Long assignmentId;
+    private Long studentId;
 
     public ResultDTO(Result r) {
         this.id = r.getId();
@@ -18,6 +19,7 @@ public class ResultDTO {
         this.submittedAt = r.getSubmittedAt();
         this.examId = r.getExam().getId();
         this.assignmentId = r.getAssignment().getId();
+        this.studentId = r.getStudent().getId();
     }
 
     // Getters (for JSON serialization)
@@ -44,4 +46,37 @@ public class ResultDTO {
     public Long getAssignmentId() {
         return assignmentId;
     }
+
+    public Long getStudentId() {
+        return studentId;
+    }
+
+    public void setSubmittedAt(LocalDateTime submittedAt) {
+        this.submittedAt = submittedAt;
+    }
+
+    public void setExamId(Long examId) {
+        this.examId = examId;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setStudentId(Long studentId) {
+        this.studentId = studentId;
+    }
+
+    public void setAssignmentId(Long assignmentId) {
+        this.assignmentId = assignmentId;
+    }
+
+    public void setScore(double score) {
+        this.score = score;
+    }
+
+    public void setStudentName(String studentName) {
+        this.studentName = studentName;
+    }
+
 }
